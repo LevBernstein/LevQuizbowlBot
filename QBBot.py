@@ -1,6 +1,6 @@
-#Lev's Quizbowl Bot'
+#Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.1.0
+#Version 1.1.1
 
 
 import discord
@@ -177,7 +177,7 @@ async def on_message(text):
                     names.append(x)
                 limit = len(names)
                 print("Length = " + str(limit))
-                report = "Hold on a moment..."
+                report = "Hold on a moment..." #temporary message, to be replaced with the atual scores
                 newtext = await text.channel.send(report)
                 sleep(.1)
                 report = ""
