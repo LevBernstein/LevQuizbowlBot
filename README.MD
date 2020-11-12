@@ -20,7 +20,9 @@ https://discord.com/api/oauth2/authorize?client_id=776233398954885140&permission
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
 
+### Setup
 
+You will have to make a role named "reader" that is lower in the role hierarchy than the bot's highest role.
 
 ## License
 This program is free software: you can redistribute it and/or modify
