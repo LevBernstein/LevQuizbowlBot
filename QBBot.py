@@ -181,21 +181,26 @@ async def on_message(text):
             if current == games[i].getChannel():
                 exist = True
                 for x,y in games[i].scores.items():
-                    diction[x.nick] = y
+                    diction[x.mention] = y
                 sortedDict = OrderedDict(sorted(diction.items(), key = operator.itemgetter(1)))
                 print(sortedDict)
                 for x, y in sortedDict.items():
                     names.append(x)
                 limit = len(names)
                 print("Length = " + str(limit))
+                report = "Hold on a moment..."
+                newtext = await text.channel.send(report)
+                sleep(.1)
                 report = ""
                 for i in range(limit):
                     report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
                 print(report)
                 #report = "Jeff"
+                await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
+                #will mention users without actually pinging them.
         if exist == False:
             report = "You need to start a game first! Use '!start' to start a game"
-        await text.channel.send(report)
+            await text.channel.send(report)
         
             
 
