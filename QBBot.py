@@ -214,7 +214,13 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
  
+    if text.content.startswith('!github'):
+        await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot")
+        
+    if text.content.startswith('!report'):
+        await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot/issues")
+ 
     if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
-        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game.')
+        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
 
 client.run(token)
