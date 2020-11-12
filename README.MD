@@ -26,6 +26,12 @@ yourself is a good idea.
 
 You will have to make a role named "reader" that is lower in the role hierarchy than the bot's highest role.
 
+## To-Do
+
+* Teams. Will be done with roles.
+
+* Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is a inelegant solution.
+
 ## License
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
