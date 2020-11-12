@@ -40,6 +40,10 @@ class Instance:
         else:
             return False
     
+    def clear(self):
+        self.buzzes = deque()
+        self.buzzed = deque()
+    
 games = [] #Array holding all active games
 
 
@@ -79,6 +83,7 @@ async def on_message(text):
                 report = "Ended the game active in this channel."
                 role = get(text.guild.roles, name = 'reader')
                 await text.author.remove_roles(role)
+                break
         if exist == False:
             report = "You do not currently have an active game."
         await text.channel.send(report)
@@ -89,11 +94,11 @@ async def on_message(text):
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
-                games[i].buzz(text.author)
-                print("Buzzed!")
                 if games[i].hasBuzzed(text.author):
                     print(str(text.author.mention) + ", you have already buzzed.")
                 else:
+                    games[i].buzz(text.author)
+                    print("Buzzed!")
                     report = str(text.author.mention) + " buzzed."
                     await text.channel.send(report)
                 break
@@ -101,5 +106,18 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game"
             await text.channel.send(report)
             
-        
+    if text.content.startswith('!clear'):#DONE
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                games[i].clear()
+                report = "Cleared."
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game"
+        await text.channel.send(report)
+
+
+
 client.run(token)
