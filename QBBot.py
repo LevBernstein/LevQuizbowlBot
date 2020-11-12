@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot'
 #Author: Lev Bernstein
-#Version 1.0.2
+#Version 1.1.0
 
 
 import discord
@@ -30,6 +30,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.buzzes = deque()
         self.buzzed = deque()
         self.active = False
+        self.reader = 0
 
     def getChannel(self):
         return self.channel
@@ -90,7 +91,8 @@ async def on_ready():
 async def on_message(text):
     report = ""
     text.content=text.content.lower()
-    if text.content.startswith('!start'): #DONE
+    
+    if text.content.startswith('!start'):
         current = text.channel.id
         exist = False
         for i in range(len(games)):
@@ -98,8 +100,9 @@ async def on_message(text):
                 exist = True
                 break
         if exist == False:
-            report = ("Starting a new game. Reader is " + text.author.mention)
+            report = ("Starting a new game. Reader is " + text.author.mention + ".")
             x = Instance(current)
+            x.reader = text.author.id
             games.append(x)
             print(x.getChannel())
             role = get(text.guild.roles, name = 'reader') #The bot needs you to make a role called "reader" in order to function.
@@ -107,71 +110,57 @@ async def on_message(text):
         else:
             report = "You already have an active game in this channel."
         await text.channel.send(report)
-           
-    if text.content.startswith('!end'): #DONE
+     
+    if text.content.startswith('!end'): 
         current = text.channel.id
         exist = False
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
-                games.pop(i)
-                report = "Ended the game active in this channel."
-                role = get(text.guild.roles, name = 'reader')
-                await text.author.remove_roles(role)
+                if text.author.id == games[i].reader:
+                    games.pop(i)
+                    report = "Ended the game active in this channel."
+                    role = get(text.guild.roles, name = 'reader')
+                    reader = 0
+                    await text.author.remove_roles(role)
+                else:
+                    report = "You are not the reader!"
                 break
         if exist == False:
             report = "You do not currently have an active game."
         await text.channel.send(report)
-    
-    if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
-        current = text.channel.id
-        exist = False
-        for i in range(len(games)):
-            if current == games[i].getChannel():
-                exist = True
-                if games[i].hasBuzzed(text.author):
-                    print(str(text.author.mention) + ", you have already buzzed.")
-                else:
-                    if len(games[i].buzzes) < 1:
-                        games[i].buzz(text.author)
-                        print("Buzzed!")
-                        report = str(text.author.mention) + " buzzed."
-                        await text.channel.send(report)
-                    else:
-                        games[i].buzz(text.author)
-                        print("Buzzed!")
-                break
-        if exist == False:
-            report = "You need to start a game first! Use '!start' to start a game"
-            await text.channel.send(report)
             
-    if text.content.startswith('!clear'):#DONE
+    if text.content.startswith('!clear'):
         current = text.channel.id
         exist = False
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
-                games[i].clear()
-                report = "Cleared."
-                break
-        if exist == False:
-            report = "You need to start a game first! Use '!start' to start a game"
-        await text.channel.send(report)
-
-    if isInt(text.content):
-        print(text.content + " is an int")
-        current = text.channel.id
-        exist = False
-        for i in range(len(games)):
-            if current == games[i].getChannel():
-                exist = True
-                if games[i].gain(int(text.content)):
-                    await text.channel.send("Awarded points. Next TU.")
+                if text.author.id == games[i].reader:
+                    games[i].clear()
+                    report = "Cleared."
+                    break
                 else:
-                    if len(games[i].buzzes) > 0:
-                        await text.channel.send((games[i].buzzes[-1]).mention + " buzzed.")
-                break
-
+                    report = "You are not the reader!"
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game."
+        await text.channel.send(report)
+    
+    if isInt(text.content): #Assigns points
+            print(text.content + " is an int")
+            current = text.channel.id
+            exist = False
+            for i in range(len(games)):
+                if current == games[i].getChannel():
+                    exist = True
+                    if text.author.id == games[i].reader:
+                        if games[i].gain(int(text.content)):
+                            await text.channel.send("Awarded points. Next TU.")
+                        else:
+                            if len(games[i].buzzes) > 0:
+                                await text.channel.send((games[i].buzzes[-1]).mention + " buzzed.")
+                    break
+    
     if text.content.startswith('!score'):
         names = []
         current = text.channel.id
@@ -198,10 +187,34 @@ async def on_message(text):
                 #report = "Jeff"
                 await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
                 #will mention users without actually pinging them.
+                break
         if exist == False:
-            report = "You need to start a game first! Use '!start' to start a game"
+            report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
-        
-            
+ 
+    if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                if games[i].hasBuzzed(text.author):
+                    print(str(text.author.mention) + ", you have already buzzed.")
+                else:
+                    if len(games[i].buzzes) < 1:
+                        games[i].buzz(text.author)
+                        print("Buzzed!")
+                        report = str(text.author.mention) + " buzzed."
+                        await text.channel.send(report)
+                    else:
+                        games[i].buzz(text.author)
+                        print("Buzzed!")
+                break
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game."
+            await text.channel.send(report)
+ 
+    if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
+        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game.')
 
 client.run(token)
