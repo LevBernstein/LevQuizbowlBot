@@ -98,7 +98,7 @@ async def on_message(text):
                 exist = True
                 break
         if exist == False:
-            report = ("Starting a new game. Reader is " + text.author.mention))
+            report = ("Starting a new game. Reader is " + text.author.mention)
             x = Instance(current)
             games.append(x)
             print(x.getChannel())
