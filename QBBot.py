@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot'
 #Author: Lev Bernstein
-#Version 1.0.0
+#Version 1.0.2
 
 
 import discord
@@ -98,7 +98,7 @@ async def on_message(text):
                 exist = True
                 break
         if exist == False:
-            report = "Starting a new game."
+            report = ()"Starting a new game. Reader is " + text.author.mention)
             x = Instance(current)
             games.append(x)
             print(x.getChannel())
