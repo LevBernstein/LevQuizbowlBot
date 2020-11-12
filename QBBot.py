@@ -1,10 +1,15 @@
+#Lev's Quizbowl Bot'
+#Author: Lev Bernstein
+#Version 1.0.0
+
+
 import discord
 from discord.ext import commands
 from discord.utils import get
 from time import sleep
 import random as random
 import operator
-from collections import deque
+from collections import deque, OrderedDict
 
 
 f = open("token.txt", "r") #in token.txt, just put in your own discord api token
@@ -17,7 +22,7 @@ def isInt(st): #checks if entered message is actually the points being awarded
         return st[1:].isdigit()
     return st.isdigit()
 
-class Instance:
+class Instance: #instance of an active game. Every channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
         self.TUnum = 0
@@ -91,6 +96,7 @@ async def on_message(text):
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
+                break
         if exist == False:
             report = "Starting a new game."
             x = Instance(current)
@@ -117,7 +123,7 @@ async def on_message(text):
             report = "You do not currently have an active game."
         await text.channel.send(report)
     
-    if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz'):
+    if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
         current = text.channel.id
         exist = False
         for i in range(len(games)):
@@ -147,6 +153,7 @@ async def on_message(text):
                 exist = True
                 games[i].clear()
                 report = "Cleared."
+                break
         if exist == False:
             report = "You need to start a game first! Use '!start' to start a game"
         await text.channel.send(report)
@@ -163,5 +170,33 @@ async def on_message(text):
                 else:
                     if len(games[i].buzzes) > 0:
                         await text.channel.send((games[i].buzzes[-1]).mention + " buzzed.")
+                break
+
+    if text.content.startswith('!score'):
+        names = []
+        current = text.channel.id
+        exist = False
+        diction = {}
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                for x,y in games[i].scores.items():
+                    diction[x.nick] = y
+                sortedDict = OrderedDict(sorted(diction.items(), key = operator.itemgetter(1)))
+                print(sortedDict)
+                for x, y in sortedDict.items():
+                    names.append(x)
+                limit = len(names)
+                print("Length = " + str(limit))
+                report = ""
+                for i in range(limit):
+                    report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
+                print(report)
+                #report = "Jeff"
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game"
+        await text.channel.send(report)
+        
+            
 
 client.run(token)
