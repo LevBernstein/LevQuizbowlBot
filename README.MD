@@ -13,6 +13,7 @@ this should contain your Discord API token.
 Alternatively, if you just want to add the bot to your own Discord 
 server while I host it, you can simply click this link: 
 https://discord.com/api/oauth2/authorize?client_id=776233398954885140&permissions=8&scope=bot
+
 I'll hopefully have the bot online most of the time, but just in case I'm offline, hosting it
 yourself is a good idea.
 
