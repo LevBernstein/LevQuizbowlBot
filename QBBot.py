@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.2.1
+#Version 1.2.2
 
 
 import discord
@@ -171,6 +171,24 @@ async def on_message(text):
             report = "You do not currently have an active game."
         await text.channel.send(report)
             
+    if text.content.startswith('!dead'):
+        print("calling dead")
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                if text.author.id == games[i].reader:
+                    games[i].clear()
+                    games[i].TUnum+=1
+                    report = "TU goes dead. Next TU."
+                    break
+                else:
+                    report = "You are not the reader!"
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game."
+        await text.channel.send(report)
+    
     if text.content.startswith('!clear'):
         print("calling clear")
         current = text.channel.id
@@ -180,8 +198,7 @@ async def on_message(text):
                 exist = True
                 if text.author.id == games[i].reader:
                     games[i].clear()
-                    games[i].TUnum+=1
-                    report = "Cleared."
+                    report = "Buzzers cleared, anyone can buzz."
                     break
                 else:
                     report = "You are not the reader!"
@@ -280,7 +297,8 @@ async def on_message(text):
         emb.add_field(name= "!start", value= "Starts a new game.", inline=False)
         emb.add_field(name= "buzz", value= "Buzzes in.", inline=False)
         emb.add_field(name= "Any positive or negative whole number", value= "After a buzz, the reader can enter a whole number to assign points.", inline=False)
-        emb.add_field(name= "!clear", value= "Clears buzzers after a TU goes dead.", inline=False)
+        emb.add_field(name= "!clear", value= "Clears buzzes without advancing the TU count.", inline=False)
+        emb.add_field(name= "!dead", value= "Clears buzzes after a dead TU and advances the TU count.", inline=False)
         emb.add_field(name= "!score", value= "Displays the score, sorted from highest to lowest.", inline=False)
         emb.add_field(name= "!end", value= "Ends the active game.", inline=False)
         emb.add_field(name= "!team [red/blue/green/orange/yellow/purple]", value= "Assigns you the team role corresponding to the color you entered.", inline=False)
