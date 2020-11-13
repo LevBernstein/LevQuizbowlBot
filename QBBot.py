@@ -102,7 +102,7 @@ async def on_message(text):
         else:
             await text.channel.send("This command is only usable by server admins!")
     
-    if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+    if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple, Team black
         print("calling team")
         report = "Invalid role!"
         if text.content.startswith('!team red'):
@@ -129,6 +129,10 @@ async def on_message(text):
             role = get(text.guild.roles, name = 'Team purple')
             await text.author.add_roles(role)
             report = "Gave you the role, " + text.author.mention + "."
+        if text.content.startswith('!team black'):
+            role = get(text.guild.roles, name = 'Team black')
+            await text.author.add_roles(role)
+            report = "Gave you the role, "  + text.author.mention + "."
         await text.channel.send(report)
    
     if text.content.startswith('!start'):
@@ -283,7 +287,7 @@ async def on_message(text):
         emb.add_field(name= "!clear", value= "Clears buzzers after a TU goes dead.", inline=False)
         emb.add_field(name= "!score", value= "Displays the score, sorted from highest to lowest.", inline=False)
         emb.add_field(name= "!end", value= "Ends the active game.", inline=False)
-        emb.add_field(name= "!team [red/blue/green/orange/yellow/purple]", value= "Assigns you the team role corresponding to the color you entered.", inline=False)
+        emb.add_field(name= "!team [red/blue/green/orange/yellow/purple/black]", value= "Assigns you the team role corresponding to the color you entered.", inline=False)
         emb.add_field(name= "!call", value= "Mentions everyone in the server and informs them that it is time for practice. Usable only by admins.", inline=False)
         emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=False)
         emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=False)
