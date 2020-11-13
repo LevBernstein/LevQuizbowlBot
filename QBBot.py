@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.2.2
+#Version 1.2.4
 
 
 import discord
@@ -219,7 +219,7 @@ async def on_message(text):
                         await text.channel.send("Awarded points. Next TU.")
                     else:
                         if len(games[i].buzzes) > 0:
-                            await text.channel.send((games[i].buzzes[-1]).mention + " buzzed.")
+                            await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
                 break
     
     if text.content.startswith('!score'):
