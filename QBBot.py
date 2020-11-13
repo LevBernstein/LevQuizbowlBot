@@ -94,7 +94,7 @@ async def on_message(text):
     report = ""
     text.content=text.content.lower()
     
-    if text.content.startswith('!summon') or text.content.startswith('!call'):
+    if (text.content.startswith('!summon') or text.content.startswith('!call')) and text.author.guild_permissions.administrator:
         await text.channel.send("@everyone Time for practice!")
     
     if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
@@ -221,7 +221,7 @@ async def on_message(text):
                 #report = ""
                 for i in range(limit):
                     #report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
-                    emb.add_field(name=(str(i+1) + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
+                    emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
                 #print(report)
                 #report = "Jeff"
                 #await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
@@ -261,6 +261,19 @@ async def on_message(text):
         await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot/issues")
  
     if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
-        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
+        emb = discord.Embed(title="Lev's Quizbowl Bot Commands", description="", color=0x57068C)
+        emb.add_field(name= "!start", value= "Starts a new game.", inline=False)
+        emb.add_field(name= "buzz", value= "Buzzes in.", inline=False)
+        emb.add_field(name= "Any positive or negative whole number", value= "After a buzz, the reader can enter a whole number to assign points.", inline=False)
+        emb.add_field(name= "!clear", value= "Clears buzzers after a TU goes dead.", inline=False)
+        emb.add_field(name= "!score", value= "Displays the score, sorted from highest to lowest.", inline=False)
+        emb.add_field(name= "!end", value= "Ends the active game.", inline=False)
+        emb.add_field(name= "!team [red/blue/green/orange/yellow/purple]", value= "Assigns you the team role corresponding to the color you entered.", inline=False)
+        emb.add_field(name= "!call", value= "Mentions everyone in the server and informs them that it is time for practice. Usable only by admins.", inline=False)
+        emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=False)
+        emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=False)
+        await text.channel.send(embed=emb)
+        
+        #await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
 
 client.run(token)
