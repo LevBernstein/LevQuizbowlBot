@@ -57,7 +57,7 @@ In the Unix command line, cd to the directory containing QBBot.py. Then run "pyt
 
 * Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.
 
-* ~~ Proper TU# tracking and reporting. ~~ Implemented as of version 1.2.1.
+* <strike>Proper TU# tracking and reporting.</strike> Implemented as of version 1.2.1.
 
 ## License
 This program is free software: you can redistribute it and/or modify
