@@ -275,8 +275,20 @@ async def on_message(text):
         emb.add_field(name= "!call", value= "Mentions everyone in the server and informs them that it is time for practice. Usable only by admins.", inline=False)
         emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=False)
         emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=False)
+        emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=False)
         await text.channel.send(embed=emb)
         
         #await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
+
+    if text.content.startswith('!tu'):
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                report = "Current TU: #" + str(games[i].TUnum + 1) + "."
+        if exist == False:
+            report = "You need to start a game first! Use '!start' to start a game."
+        await text.channel.send(report)
 
 client.run(token)
