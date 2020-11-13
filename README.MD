@@ -30,6 +30,27 @@ yourself is a good idea.
 
 You will have to make a role named "reader" that is lower in the role hierarchy than the bot's highest role.
 
+If you want to make use of teams, you will need to make the following roles:
+
+* Team red
+
+* Team blue
+
+* Team green
+
+* Team orange
+
+* Team yellow
+
+* Team purple
+
+All of them must be lower in the role hierarchy than the bot's highest role.
+
+
+### Running the bot
+
+In the Unix command line, cd to the directory containing QBBot.py. Then run "python3 QBBot.py"
+
 ## To-Do
 
 * Teams. Will be done with roles.
