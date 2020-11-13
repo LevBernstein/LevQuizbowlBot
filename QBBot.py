@@ -94,26 +94,34 @@ async def on_message(text):
     text.content=text.content.lower()
     
     if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+        report = "Invalid role!"
         if text.content.startswith('!team red'):
             role = get(text.guild.roles, name = 'Team red')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
         if text.content.startswith('!team blue'):
             role = get(text.guild.roles, name = 'Team blue')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
         if text.content.startswith('!team green'):
             role = get(text.guild.roles, name = 'Team green')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
         if text.content.startswith('!team orange'):
             role = get(text.guild.roles, name = 'Team orange')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
         if text.content.startswith('!team yellow'):
             role = get(text.guild.roles, name = 'Team yellow')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
         if text.content.startswith('!team purple'):
             role = get(text.guild.roles, name = 'Team purple')
             await text.author.add_roles(role)
+            report = "Gave you the role, " + text.author.mention + "."
+        await text.channel.send(report)
    
-   if text.content.startswith('!start'):
+    if text.content.startswith('!start'):
         current = text.channel.id
         exist = False
         for i in range(len(games)):
