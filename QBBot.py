@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.1.1
+#Version 1.1.3
 
 
 import discord
@@ -72,6 +72,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
                     self.active = False
                     self.clear()
                     awarded = True
+                self.TUnum +=1
             else:
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
@@ -92,7 +93,27 @@ async def on_message(text):
     report = ""
     text.content=text.content.lower()
     
-    if text.content.startswith('!start'):
+    if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+        if text.content.startswith('!team red'):
+            role = get(text.guild.roles, name = 'Team red')
+            await text.author.add_roles(role)
+        if text.content.startswith('!team blue'):
+            role = get(text.guild.roles, name = 'Team blue')
+            await text.author.add_roles(role)
+        if text.content.startswith('!team green'):
+            role = get(text.guild.roles, name = 'Team green')
+            await text.author.add_roles(role)
+        if text.content.startswith('!team orange'):
+            role = get(text.guild.roles, name = 'Team orange')
+            await text.author.add_roles(role)
+        if text.content.startswith('!team yellow'):
+            role = get(text.guild.roles, name = 'Team yellow')
+            await text.author.add_roles(role)
+        if text.content.startswith('!team purple'):
+            role = get(text.guild.roles, name = 'Team purple')
+            await text.author.add_roles(role)
+   
+   if text.content.startswith('!start'):
         current = text.channel.id
         exist = False
         for i in range(len(games)):
@@ -138,6 +159,7 @@ async def on_message(text):
                 exist = True
                 if text.author.id == games[i].reader:
                     games[i].clear()
+                    games[i].TUnum+=1
                     report = "Cleared."
                     break
                 else:
@@ -169,24 +191,30 @@ async def on_message(text):
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
+                emb = discord.Embed(title="Score", description="Score after TU# " + str(games[i].TUnum) + ": ", color=0x57068C)
                 for x,y in games[i].scores.items():
-                    diction[x.mention] = y
+                    if x.nick == 'none' or x.nick == 'None' or x.nick == None:
+                        diction[x.name] = y
+                    else:
+                        diction[x.nick] = y
                 sortedDict = OrderedDict(sorted(diction.items(), key = operator.itemgetter(1)))
                 print(sortedDict)
                 for x, y in sortedDict.items():
                     names.append(x)
                 limit = len(names)
                 print("Length = " + str(limit))
-                report = "Hold on a moment..." #temporary message, to be replaced with the atual scores
-                newtext = await text.channel.send(report)
-                sleep(.1)
-                report = ""
+                #report = "Hold on a moment..." #temporary message, to be replaced with the actual scores
+                #newtext = await text.channel.send(report)
+                #sleep(.1)
+                #report = ""
                 for i in range(limit):
-                    report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
-                print(report)
+                    #report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
+                    emb.add_field(name=(str(i+1) + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
+                #print(report)
                 #report = "Jeff"
-                await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
+                #await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
                 #will mention users without actually pinging them.
+                await text.channel.send(embed=emb)
                 break
         if exist == False:
             report = "You need to start a game first! Use '!start' to start a game."
