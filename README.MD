@@ -55,7 +55,7 @@ In the Unix command line, cd to the directory containing QBBot.py. Then run "pyt
 
 * Teams. Will be done with roles.
 
-* Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is a inelegant solution.
+* Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.
 
 * Proper TU# tracking and reporting.
 
