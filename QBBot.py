@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.1.3
+#Version 1.2.0
 
 
 import discord
@@ -94,8 +94,11 @@ async def on_message(text):
     report = ""
     text.content=text.content.lower()
     
-    if (text.content.startswith('!summon') or text.content.startswith('!call')) and text.author.guild_permissions.administrator:
-        await text.channel.send("@everyone Time for practice!")
+    if (text.content.startswith('!summon') or text.content.startswith('!call')):
+        if text.author.guild_permissions.administrator:
+            await text.channel.send("@everyone Time for practice!")
+        else:
+            await text.channel.send("This command is only usable by server admins!")
     
     if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
         report = "Invalid role!"
@@ -222,9 +225,9 @@ async def on_message(text):
                 for i in range(limit):
                     #report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
                     emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
+                    #Because I put the scores in an embed, I can no longer mention everyone. So, there's now no reason to edit the message.'
                 #print(report)
-                #report = "Jeff"
-                #await newtext.edit(content=report) #Here, I edit the message to display the score after first displaying filler so that the bot
+                #await newtext.edit(content=report) #Here, I used to edit the message to display the score after first displaying filler so that the bot
                 #will mention users without actually pinging them.
                 await text.channel.send(embed=emb)
                 break
