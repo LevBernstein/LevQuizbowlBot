@@ -93,7 +93,7 @@ async def on_ready():
 async def on_message(text):
     report = ""
     text.content=text.content.lower()
-    
+    #print(text.content)
     if (text.content.startswith('!summon') or text.content.startswith('!call')):
         if text.author.guild_permissions.administrator:
             await text.channel.send("@everyone Time for practice!")
@@ -183,7 +183,7 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game."
         await text.channel.send(report)
     
-    if isInt(text.content): #Assigns points
+    if text.author.bot == False and isInt(text.content): #Assigns points. Checks if bot because, otherwise, the Bot's own embedded messages would throw errors.
             print(text.content + " is an int")
             current = text.channel.id
             exist = False
