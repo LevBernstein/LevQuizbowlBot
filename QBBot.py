@@ -260,7 +260,7 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
  
-    if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
+    if text.author.bot == False and (text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz')):
         print("calling buzz")
         current = text.channel.id
         exist = False
