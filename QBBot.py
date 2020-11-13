@@ -31,6 +31,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.buzzed = deque()
         self.active = False
         self.reader = 0
+        #Need an array of Member objects of each team color
 
     def getChannel(self):
         return self.channel
@@ -92,6 +93,9 @@ async def on_ready():
 async def on_message(text):
     report = ""
     text.content=text.content.lower()
+    
+    if text.content.startswith('!summon') or text.content.startswith('!call'):
+        await text.channel.send("@everyone Time for practice!")
     
     if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
         report = "Invalid role!"
@@ -257,6 +261,6 @@ async def on_message(text):
         await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot/issues")
  
     if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
-        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
+        await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
 
 client.run(token)
