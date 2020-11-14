@@ -244,7 +244,7 @@ async def on_message(text):
                             await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
                 break
     
-    if text.content.startswith('!btoggle,bonus,bstop'): #Toggles if bonus mode is enabled
+    if text.content.startswith('!btoggle'): #Toggles if bonus mode is enabled
         print("calling btoggle")
         current = text.channel.id
         exist = False
@@ -255,7 +255,7 @@ async def on_message(text):
                     games[i].bonusEnabled = not games[i].bonusEnabled
                 break
     
-    if text.content.startswith('!bonus,bstop'): #Awards bonus
+    if text.content.startswith('!bonus'): #Awards bonus
         print("calling bonus")
         current = text.channel.id
         exist = False
