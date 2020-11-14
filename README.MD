@@ -49,13 +49,15 @@ All of them must be lower in the role hierarchy than the bot's highest role.
 
 ### Running the bot
 
-In the Unix command line, cd to the directory containing QBBot.py. Then run "python3 QBBot.py"
+In the *nix command line, cd to the directory containing QBBot.py. Then run "python3 QBBot.py"
+
+The bot outputs a lot to the command line, just because I like having a lot of information available. You can comment out the print statements if they annoy.
 
 ## To-Do
 
 * Teams. Will be done with roles.
 
-* Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.
+* <strike>Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.</strike> Implemented as of version 1.3.0.
 
 * <strike>Proper TU# tracking and reporting.</strike> Implemented as of version 1.2.1.
 
