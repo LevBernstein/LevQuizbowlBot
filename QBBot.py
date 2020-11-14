@@ -32,7 +32,11 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.active = False
         self.reader = 0
         #Need an array of Member objects of each team color
-        #self.bonusEnabled = False #Write method to toggle bonuses per Instance; if bonuses are toggled, just about everything will behave differently
+
+        self.bonusEnabled = False #Write method to toggle bonuses per Instance; if bonuses are toggled, just about everything will behave differently
+        self.bonusMode = False
+        self.lastBonusMem = None
+        self.points = {"tu": 10, "bonus": 20} #Write method to set these point values per game
 
     def getChannel(self):
         return self.channel
@@ -75,12 +79,30 @@ class Instance: #instance of an active game. Every channel a game is run in gets
                     self.clear()
                     awarded = True
                 self.TUnum +=1
+                if self.bonusEnabled:
+                    self.lastBonusMem = mem
+                    self.bonusMode = True #TODO send message that we are in bonus mode
             else:
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points  
         return awarded
+
+    def bonusGain(self):
+        if not self.bonusEnabled:
+            return #TODO send message that bonus mode is not enabled
+        if not self.bonusMode:
+            return #TODO send message that we are not in bonus mode
+
+        self.scores[self.lastBonusMem] += self.points["bonus"]
+        
+    def bonusStop(self):
+        if self.bonusEnabled:
+            self.lastBonusMem = None
+            self.bonusMode = False
+        else:
+            pass #TODO send message that bonus mode is not enabled
     
 games = [] #Array holding all active games
 
@@ -222,6 +244,39 @@ async def on_message(text):
                             await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
                 break
     
+    if text.content.startswith('!btoggle,bonus,bstop'): #Toggles if bonus mode is enabled
+        print("calling btoggle")
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                if text.author.id == games[i].reader:
+                    games[i].bonusEnabled = not games[i].bonusEnabled
+                break
+    
+    if text.content.startswith('!bonus,bstop'): #Awards bonus
+        print("calling bonus")
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                if text.author.id == games[i].reader:
+                    games[i].bonusGain()
+                break
+    
+    if text.content.startswith('!bstop'): #Ends current bonus round
+        print("calling bstop")
+        current = text.channel.id
+        exist = False
+        for i in range(len(games)):
+            if current == games[i].getChannel():
+                exist = True
+                if text.author.id == games[i].reader:
+                    games[i].bonusStop()
+                break
+    
     if text.content.startswith('!score'):
         print("calling score")
         names = []
@@ -306,6 +361,9 @@ async def on_message(text):
         emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=False)
         emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=False)
         emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=False)
+        emb.add_field(name= "!btoggle", value= "Toggles if bonuses are enabled.", inline=False)
+        emb.add_field(name= "!bonus", value= "After a TU when bonuses are enabled, a bonus is awarded.", inline=False)
+        emb.add_field(name= "!bstop", value= "Exits bonus mode.", inline=False)
         await text.channel.send(embed=emb)
         
         #await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
