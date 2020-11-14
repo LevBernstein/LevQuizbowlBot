@@ -31,8 +31,6 @@
 *.i*86
 *.x86_64
 *.hex
-problem1
-problem2
 
 # Debug files
 *.dSYM/
