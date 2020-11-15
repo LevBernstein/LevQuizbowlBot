@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.3.1
+#Version 1.3.2
 
 
 import discord
@@ -35,6 +35,12 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.bonusEnabled = True 
         self.bonusMode = False
         self.lastBonusMem = None
+        self.redTeam = []
+        self.blueTeam = []
+        self.greenTeam = []
+        self.orangeTeam = []
+        self.yellowTeam = []
+        self.purpleTeam = []
 
     def getChannel(self):
         return self.channel
@@ -126,30 +132,45 @@ async def on_message(text):
         if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
             print("calling team")
             report = "Invalid role!"
-            if text.content.startswith('!team r'):
-                role = get(text.guild.roles, name = 'Team red')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-            if text.content.startswith('!team b'):
-                role = get(text.guild.roles, name = 'Team blue')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-            if text.content.startswith('!team g'):
-                role = get(text.guild.roles, name = 'Team green')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-            if text.content.startswith('!team o'):
-                role = get(text.guild.roles, name = 'Team orange')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-            if text.content.startswith('!team y'):
-                role = get(text.guild.roles, name = 'Team yellow')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-            if text.content.startswith('!team p'):
-                role = get(text.guild.roles, name = 'Team purple')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+            current = text.channel.id
+            exist = False
+            for i in range(len(games)):
+                if current == games[i].getChannel():
+                    exist = True
+                    break
+            if exist:
+                if text.content.startswith('!team r'):
+                    role = get(text.guild.roles, name = 'Team red')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].redTeam.append(text.author)
+                if text.content.startswith('!team b'):
+                    role = get(text.guild.roles, name = 'Team blue')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].blueTeam.append(text.author)
+                if text.content.startswith('!team g'):
+                    role = get(text.guild.roles, name = 'Team green')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].greenTeam.append(text.author)
+                if text.content.startswith('!team o'):
+                    role = get(text.guild.roles, name = 'Team orange')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].orangeTeam.append(text.author)
+                if text.content.startswith('!team y'):
+                    role = get(text.guild.roles, name = 'Team yellow')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].yellowTeam.append(text.author)
+                if text.content.startswith('!team p'):
+                    role = get(text.guild.roles, name = 'Team purple')
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    games[i].purpleTeam.append(text.author)
+            else:
+                report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
     
         if text.content.startswith('!start'):
@@ -164,10 +185,10 @@ async def on_message(text):
                 report = ("Starting a new game. Reader is " + text.author.mention + ".")
                 x = Instance(current)
                 x.reader = text.author.id
-                games.append(x)
                 print(x.getChannel())
                 role = get(text.guild.roles, name = 'reader') #The bot needs you to make a role called "reader" in order to function.
                 await text.author.add_roles(role)
+                games.append(x)
             else:
                 report = "You already have an active game in this channel."
             await text.channel.send(report)
@@ -255,7 +276,7 @@ async def on_message(text):
                     break
         
         if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'): #Toggles if bonus mode is enabled. It is enabled by default.
-            print("calling btoggle")
+            print("calling bonusmode")
             current = text.channel.id
             exist = False
             for i in range(len(games)):
@@ -270,20 +291,6 @@ async def on_message(text):
                     break
             if exist == False:
                 await text.channel.send("You need to start a game first! Use '!start' to start a game.")
-        
-        ''' 
-        #DEPRECATED
-        if text.content.startswith('!bonus'): #Awards bonus
-            print("calling bonus")
-            current = text.channel.id
-            exist = False
-            for i in range(len(games)):
-                if current == games[i].getChannel():
-                    exist = True
-                    if text.author.id == games[i].reader:
-                        games[i].bonusGain()
-                    break
-        '''
         
         if text.content.startswith('!bstop'): #Ends current bonus round. Use this to kill a bonus without giving points.
             print("calling bstop")
@@ -318,17 +325,8 @@ async def on_message(text):
                         names.append(x)
                     limit = len(names)
                     print("Length = " + str(limit))
-                    #report = "Hold on a moment..." #temporary message, to be replaced with the actual scores
-                    #newtext = await text.channel.send(report)
-                    #sleep(.1)
-                    #report = ""
                     for i in range(limit):
-                        #report += (str(i+1) + ". " + names[limit-(i+1)] + ": " + str(sortedDict[names[limit-(i+1)]]) + "\r\n")
                         emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
-                        #Because I put the scores in an embed, I can no longer mention everyone. So, there's now no reason to edit the message.'
-                    #print(report)
-                    #await newtext.edit(content=report) #Here, I used to edit the message to display the score after first displaying filler so that the bot
-                    #will mention users without actually pinging them.
                     await text.channel.send(embed=emb)
                     break
             if exist == False:
@@ -338,6 +336,7 @@ async def on_message(text):
         if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
             print("calling buzz")
             current = text.channel.id
+            #TODO: add buzzing member to team array if they aren't already in one. Requires the get command and text.author.roles.
             exist = False
             for i in range(len(games)):
                 if current == games[i].getChannel():
