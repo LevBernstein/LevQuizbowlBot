@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.3.5
+#Version: 1.3.6
 
 
 import discord
@@ -30,8 +30,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.buzzes = deque()
         self.buzzed = deque()
         self.active = False
-        self.reader = 0
-        #TODO Need an array of Member objects of each team color
+        self.reader = 0 #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
         self.bonusEnabled = True 
         self.bonusMode = False
         self.lastBonusMem = None
@@ -319,6 +318,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
+                    #reader = get(text.guild.roles, name = 'reader')
                     if text.author.id == games[i].reader:
                         if games[i].bonusEnabled == False: #bonuses disabled
                             if games[i].gain(int(text.content)):
@@ -384,7 +384,29 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    emb = discord.Embed(title="Score", description="Score after TU# " + str(games[i].TUnum) + ": ", color=0x57068C)
+                    areTeams = False
+                    desc = "Score after TU# " + str(games[i].TUnum) + ": "
+                    if games[i].teamExist(games[i].redTeam):
+                        desc += "\r\nRed team: " + str(games[i].teamScore(games[i].redTeam))
+                        areTeams = True
+                    if games[i].teamExist(games[i].blueTeam):
+                        desc += "\r\nBlue team: " + str(games[i].teamScore(games[i].blueTeam))
+                        areTeams = True
+                    if games[i].teamExist(games[i].greenTeam):
+                        desc += "\r\nGreen team: " + str(games[i].teamScore(games[i].greenTeam))
+                        areTeams = True
+                    if games[i].teamExist(games[i].orangeTeam):
+                        desc += "\r\nOrange team: " + str(games[i].teamScore(games[i].orangeTeam))
+                        areTeams = True
+                    if games[i].teamExist(games[i].yellowTeam):
+                        desc += "\r\nYellow team: " + str(games[i].teamScore(games[i].yellowTeam))
+                        areTeams = True
+                    if games[i].teamExist(games[i].purpleTeam):
+                        desc += "\r\nPurple team: " + str(games[i].teamScore(games[i].purpleTeam))
+                        areTeams = True
+                    if areTeams:
+                        desc += "\r\n\r\nIndividuals:"
+                    emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                     for x,y in games[i].scores.items():
                         if x.nick == 'none' or x.nick == 'None' or x.nick == None:
                             diction[x.name] = y
@@ -411,6 +433,8 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
+                    #reader = get(text.guild.roles, name = 'reader')
+                    
                     #This block handles all team assignment that was done before the game started.
                     red = get(text.guild.roles, name = 'Team red')
                     if red in text.author.roles and not text.author in games[i].redTeam:
@@ -451,7 +475,7 @@ async def on_message(text):
                                     games[i].buzz(text.author)
                                     print("Buzzed!")
                             else: #Might want to remove this if it causes too much clutter.
-                                report = "Your team is locked out of buzzing, " + str(text.author.mention) + "."
+                                await text.channel.send("Your team is locked out of buzzing, " + str(text.author.mention) + ".")
                     else:
                         await text.channel.send("We are currently playing a bonus. You cannot buzz.")
                     break
@@ -461,11 +485,17 @@ async def on_message(text):
     
         if text.content.startswith('!github'):
             print("calling github")
-            await text.channel.send("View this bot's source code at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot")
+            emb = discord.Embed(title="Lev's Quizbowl Bot", description="", color=0x57068C)
+            #await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot")
+            emb.add_field(name= "View this bot's source code at:", value= "https://github.com/LevBernstein/LevQuizbowlBot", inline=True)
+            await text.channel.send(embed=emb)
             
         if text.content.startswith('!report'):
             print("calling report")
-            await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
+            emb = discord.Embed(title="Report bugs or suggest features", description="", color=0x57068C)
+            #await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
+            emb.add_field(name= "Report any issues at:", value= "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline=True)
+            await text.channel.send(embed=emb)
     
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
@@ -500,5 +530,9 @@ async def on_message(text):
             if exist == False:
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
+
+        if text.content.startswith('!export'):
+            #TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir
+            pass
 
 client.run(token)
