@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.3.6
+#Version: 1.3.7
 
 
 import discord
@@ -30,7 +30,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.buzzes = deque()
         self.buzzed = deque()
         self.active = False
-        self.reader = 0 #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
+        self.reader = None #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
         self.bonusEnabled = True 
         self.bonusMode = False
         self.lastBonusMem = None
@@ -246,7 +246,7 @@ async def on_message(text):
             if exist == False:
                 report = ("Starting a new game. Reader is " + text.author.mention + ".")
                 x = Instance(current)
-                x.reader = text.author.id
+                x.reader = text.author
                 print(x.getChannel())
                 role = get(text.guild.roles, name = 'reader') #The bot needs you to make a role called "reader" in order to function.
                 await text.author.add_roles(role)
@@ -262,11 +262,10 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         games.pop(i)
                         report = "Ended the game active in this channel."
                         role = get(text.guild.roles, name = 'reader')
-                        reader = 0
                         await text.author.remove_roles(role)
                     else:
                         report = "You are not the reader!"
@@ -282,7 +281,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         games[i].clear()
                         games[i].TUnum+=1
                         report = "TU goes dead. Next TU."
@@ -300,7 +299,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         games[i].clear()
                         report = "Buzzers cleared, anyone can buzz."
                         break
@@ -319,14 +318,14 @@ async def on_message(text):
                 if current == games[i].getChannel():
                     exist = True
                     #reader = get(text.guild.roles, name = 'reader')
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         if games[i].bonusEnabled == False: #bonuses disabled
                             if games[i].gain(int(text.content)):
                                 await text.channel.send("Awarded points. Next TU.")
                             else:
                                 while len(games[i].buzzes) > 0:
                                     if games[i].canBuzz(games[i].buzzes[0]):
-                                        await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                        await text.channel.send((games[i].buzzes[0]).mention + " buzzed. Pinging reader: " + str(games[i].reader.mention))
                                         break
                                     else:
                                         games[i].buzzes.popleft()
@@ -337,7 +336,7 @@ async def on_message(text):
                                 else:
                                     while len(games[i].buzzes) > 0:
                                         if games[i].canBuzz(games[i].buzzes[0]):
-                                            await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                            await text.channel.send((games[i].buzzes[0]).mention + " buzzed. Pinging reader: " + str(games[i].reader.mention))
                                             break
                                         else:
                                             games[i].buzzes.popleft()
@@ -353,7 +352,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         games[i].bonusEnabled = not games[i].bonusEnabled
                         if games[i].bonusEnabled:
                             await text.channel.send("Enabled bonus mode.")
@@ -370,7 +369,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader:
+                    if text.author.id == games[i].reader.id:
                         games[i].bonusStop()
                         await text.channel.send("Killed active bonus. Next TU.")
                     break
@@ -469,7 +468,7 @@ async def on_message(text):
                                 if len(games[i].buzzes) < 1:
                                     games[i].buzz(text.author)
                                     print("Buzzed!")
-                                    report = str(text.author.mention) + " buzzed."
+                                    report = str(text.author.mention) + " buzzed. Pinging reader: " + str(games[i].reader.mention)
                                     await text.channel.send(report)
                                 else:
                                     games[i].buzz(text.author)
