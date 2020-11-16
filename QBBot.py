@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.3.4
+#Version 1.3.5
 
 
 import discord
@@ -107,6 +107,11 @@ class Instance: #instance of an active game. Every channel a game is run in gets
                 sum += self.scores[mem]
         return sum
     
+    def teamExist(self, team): #use this to check if a team has members
+        if len(team) > 0:
+            return True
+        return False
+    
     def gain(self, points):
         awarded = False
         if self.active == True:
@@ -178,7 +183,7 @@ async def on_ready():
 async def on_message(text):
     report = ""
     text.content=text.content.lower()
-        #print(text.content)
+    #print(text.content)
     if text.author.bot == False:
         if (text.content.startswith('!summon') or text.content.startswith('!call')):
             print("calling summon")
@@ -306,7 +311,7 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if len(games) != 0 and isInt(text.content): #Assigns points. Checks if bot because, otherwise, the Bot's own embedded messages would throw errors. Checks len games to avoid unnecessary calls.
+        if len(games) != 0 and isInt(text.content): #Assigns points. Checks len games to avoid unnecessary calls.
             print("calling points")
             print(text.content + " is an int")
             current = text.channel.id
@@ -319,15 +324,23 @@ async def on_message(text):
                             if games[i].gain(int(text.content)):
                                 await text.channel.send("Awarded points. Next TU.")
                             else:
-                                if len(games[i].buzzes) > 0:
-                                    await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                while len(games[i].buzzes) > 0:
+                                    if games[i].canBuzz(games[i].buzzes[0]):
+                                        await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                        break
+                                    else:
+                                        games[i].buzzes.popleft()
                         else: #bonuses enabled
                             if games[i].bonusMode == False:
                                 if games[i].gain(int(text.content)):
                                     await text.channel.send("Awarded TU points. Awaiting bonus points.")
                                 else:
-                                    if len(games[i].buzzes) > 0:
-                                        await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                    while len(games[i].buzzes) > 0:
+                                        if games[i].canBuzz(games[i].buzzes[0]):
+                                            await text.channel.send((games[i].buzzes[0]).mention + " buzzed.")
+                                            break
+                                        else:
+                                            games[i].buzzes.popleft()
                             else: #bonusMode true
                                 games[i].bonusGain(int(text.content))
                                 await text.channel.send("Awarded bonus points. Next TU.")
@@ -428,14 +441,17 @@ async def on_message(text):
                         if games[i].hasBuzzed(text.author):
                             print(str(text.author.mention) + ", you have already buzzed.")
                         else:
-                            if len(games[i].buzzes) < 1:
-                                games[i].buzz(text.author)
-                                print("Buzzed!")
-                                report = str(text.author.mention) + " buzzed."
-                                await text.channel.send(report)
-                            else:
-                                games[i].buzz(text.author)
-                                print("Buzzed!")
+                            if games[i].canBuzz(text.author):
+                                if len(games[i].buzzes) < 1:
+                                    games[i].buzz(text.author)
+                                    print("Buzzed!")
+                                    report = str(text.author.mention) + " buzzed."
+                                    await text.channel.send(report)
+                                else:
+                                    games[i].buzz(text.author)
+                                    print("Buzzed!")
+                            else: #Might want to remove this if it causes too much clutter.
+                                report = "Your team is locked out of buzzing, " + str(text.author.mention) + "."
                     else:
                         await text.channel.send("We are currently playing a bonus. You cannot buzz.")
                     break
