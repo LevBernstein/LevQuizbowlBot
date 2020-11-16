@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.3.3
+#Version 1.3.4
 
 
 import discord
@@ -41,6 +41,12 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.orangeTeam = []
         self.yellowTeam = []
         self.purpleTeam = []
+        self.redNeg = False
+        self.blueNeg = False
+        self.greenNeg = False
+        self.orangeNeg = False
+        self.yellowNeg = False
+        self.purpleNeg = False
 
     def getChannel(self):
         return self.channel
@@ -64,9 +70,43 @@ class Instance: #instance of an active game. Every channel a game is run in gets
             return False
     
     def clear(self):
+        print("Clearing...")
         self.buzzes = deque()
         self.buzzed = deque()
+        self.unlock()
         
+    def unlock(self):
+        print("Unlocking...")
+        self.redNeg = False
+        self.blueNeg = False
+        self.greenNeg = False
+        self.orangeNeg = False
+        self.yellowNeg = False
+        self.purpleNeg = False
+    
+    def canBuzz(self, mem):
+        #TODO add this to the buzz method AND to the neg part of the any integer method
+        conditions = (
+            (mem in self.redTeam and self.redNeg==True),
+            (mem in self.blueTeam and self.blueNeg==True),
+            (mem in self.greenTeam and self.greenNeg==True),
+            (mem in self.orangeTeam and self.orangeNeg==True),
+            (mem in self.yellowTeam and self.yellowNeg==True),
+            (mem in self.purpleTeam and self.purpleNeg==True)
+        )
+        if any(conditions):
+            return False
+        else:
+            return True
+    
+    def teamScore(self, team): #pass this one of the teams, UNTESTED. Requires further team implementation.
+        #TODO test this
+        sum=0
+        for mem in team:
+            if mem in self.scores:
+                sum += self.scores[mem]
+        return sum
+    
     def gain(self, points):
         awarded = False
         if self.active == True:
@@ -91,6 +131,24 @@ class Instance: #instance of an active game. Every channel a game is run in gets
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points  
+                if mem in self.redTeam:
+                    self.redNeg = True
+                    print("red locked out")
+                if mem in self.blueTeam:
+                    self.blueNeg = True
+                    print("blue locked out")
+                if mem in self.greenTeam:
+                    self.greenNeg = True
+                    print("green locked out")
+                if mem in self.orangeTeam:
+                    self.orangeNeg = True
+                    print("orange locked out")
+                if mem in self.yellowTeam:
+                    self.yellowNeg = True
+                    print("yellow locked out")
+                if mem in self.purpleTeam:
+                    self.purpleNeg = True
+                    print("purple locked out")
         return awarded
 
     def bonusGain(self, points):
@@ -340,7 +398,6 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    
                     #This block handles all team assignment that was done before the game started.
                     red = get(text.guild.roles, name = 'Team red')
                     if red in text.author.roles and not text.author in games[i].redTeam:
