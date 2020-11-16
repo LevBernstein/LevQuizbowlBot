@@ -30,7 +30,7 @@ yourself is a good idea.
 
 You will have to make a role named "reader" that is lower in the role hierarchy than the bot's highest role.
 
-If you want to make use of teams, you will need to make the following roles:
+You will also need to make the following roles:
 
 * Team red
 
@@ -55,7 +55,15 @@ The bot outputs a lot to the command line, just because I like having a lot of i
 
 ## To-Do
 
-* Teams. Will be done with roles.
+* An undo method to undo the entering of scores and move back the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance
+
+* Score exporting through .csv files.
+
+* Command that sets a new reader, in case the reader has to leave mid-match.
+
+* Record logs for each game (as a precursor to score exporting)
+
+* <strike>Teams. Will be done with roles.</strike> Implemented as of version 1.3.6, though bonuses are still reported as individual score.
 
 * <strike>Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.</strike> Implemented as of version 1.3.0.
 
