@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version 1.3.2
+#Version 1.3.3
 
 
 import discord
@@ -336,11 +336,37 @@ async def on_message(text):
         if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
             print("calling buzz")
             current = text.channel.id
-            #TODO: add buzzing member to team array if they aren't already in one. Requires the get command and text.author.roles.
             exist = False
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
+                    
+                    #This block handles all team assignment that was done before the game started.
+                    red = get(text.guild.roles, name = 'Team red')
+                    if red in text.author.roles and not text.author in games[i].redTeam:
+                        games[i].redTeam.append(text.author)
+                        print("Added " + text.author.name +  " to red on buzz")
+                    blue = get(text.guild.roles, name = 'Team blue')
+                    if blue in text.author.roles and not text.author in games[i].blueTeam:
+                        games[i].blueTeam.append(text.author)
+                        print("Added " + text.author.name +  " to blue on buzz")
+                    green = get(text.guild.roles, name = 'Team green')
+                    if green in text.author.roles and not text.author in games[i].greenTeam:
+                        games[i].greenTeam.append(text.author)
+                        print("Added " + text.author.name +  " to green on buzz")
+                    orange = get(text.guild.roles, name = 'Team orange')
+                    if orange in text.author.roles and not text.author in games[i].orangeTeam:
+                        games[i].orangeTeam.append(text.author)
+                        print("Added " + text.author.name +  " to orange on buzz")
+                    yellow = get(text.guild.roles, name = 'Team yellow')
+                    if yellow in text.author.roles and not text.author in games[i].yellowTeam:
+                        games[i].yellowTeam.append(text.author)
+                        print("Added " + text.author.name +  " to yellow on buzz")
+                    purple = get(text.guild.roles, name = 'Team purple')
+                    if purple in text.author.roles and not text.author in games[i].purpleTeam:
+                        games[i].purpleTeam.append(text.author)
+                        print("Added " + text.author.name +  " to purple on buzz")
+                    
                     if games[i].bonusMode == False:
                         if games[i].hasBuzzed(text.author):
                             print(str(text.author.mention) + ", you have already buzzed.")
@@ -362,11 +388,11 @@ async def on_message(text):
     
         if text.content.startswith('!github'):
             print("calling github")
-            await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot")
+            await text.channel.send("View this bot's source code at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot")
             
         if text.content.startswith('!report'):
             print("calling report")
-            await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot/issues")
+            await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
     
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
