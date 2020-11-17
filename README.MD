@@ -63,11 +63,11 @@ The bot outputs a lot to the command line, just because I like having a lot of i
 
 * Record logs for each game (as a precursor to score exporting)
 
-* <strike>Teams. Will be done with roles.</strike> Fully implemented as of version 1.4.0.
+* <strike>Teams.</strike> Implemented as of version 1.4.0.
 
-* <strike>Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.</strike> Implemented as of version 1.3.0.
+* <strike>Bonuses.</strike> Implemented as of version 1.3.0.
 
-* <strike>Proper TU# tracking and reporting.</strike> Implemented as of version 1.2.1.
+* <strike>Tossup number tracking.</strike> Implemented as of version 1.2.1.
 
 ## License
 This program is free software: you can redistribute it and/or modify
