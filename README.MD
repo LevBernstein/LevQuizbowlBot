@@ -63,7 +63,7 @@ The bot outputs a lot to the command line, just because I like having a lot of i
 
 * Record logs for each game (as a precursor to score exporting)
 
-* <strike>Teams. Will be done with roles.</strike> Implemented as of version 1.3.6, though bonuses are still reported as individual score.
+* <strike>Teams. Will be done with roles.</strike> Fully implemented as of version 1.4.0.
 
 * <strike>Proper handling of bonuses. Currently, you can handle someone getting 10 on a TU and 20 on a bonus by giving them 30. This is an inelegant solution.</strike> Implemented as of version 1.3.0.
 

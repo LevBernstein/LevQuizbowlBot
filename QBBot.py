@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.3.7
+#Version: 1.4.0
 
 
 import discord
@@ -46,6 +46,12 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.orangeNeg = False
         self.yellowNeg = False
         self.purpleNeg = False
+        self.redBonus = 0
+        self.blueBonus = 0
+        self.greenBonus = 0
+        self.orangeBonus = 0
+        self.yellowBonus = 0
+        self.purpleBonus = 0
 
     def getChannel(self):
         return self.channel
@@ -98,13 +104,13 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         else:
             return True
     
-    def teamScore(self, team): #pass this one of the teams, UNTESTED. Requires further team implementation.
+    def teamScore(self, team, teamBonus): #pass this one of the teams, UNTESTED. Requires further team implementation.
         #TODO test this
-        sum=0
+        total = teamBonus
         for mem in team:
             if mem in self.scores:
-                sum += self.scores[mem]
-        return sum
+                total += self.scores[mem]
+        return total
     
     def teamExist(self, team): #use this to check if a team has members
         if len(team) > 0:
@@ -160,7 +166,29 @@ class Instance: #instance of an active game. Every channel a game is run in gets
             return
         if not self.bonusMode:
             return
-        self.scores[self.lastBonusMem] += points
+        conditions = (
+            self.lastBonusMem in self.redTeam,
+            self.lastBonusMem in self.blueTeam,
+            self.lastBonusMem in self.greenTeam,
+            self.lastBonusMem in self.orangeTeam,
+            self.lastBonusMem in self.yellowTeam,
+            self.lastBonusMem in self.purpleTeam
+            )
+        if any(conditions):
+            if self.lastBonusMem in self.redTeam:
+                self.redBonus += points
+            if self.lastBonusMem in self.blueTeam:
+                self.blueBonus += points
+            if self.lastBonusMem in self.greenTeam:
+                self.greenBonus += points
+            if self.lastBonusMem in self.orangeTeam:
+                self.orangeBonus += points
+            if self.lastBonusMem in self.yellowTeam:
+                self.yellowBonus += points
+            if self.lastBonusMem in self.purpleTeam:
+                self.purpleBonus += points
+        else:
+            self.scores[self.lastBonusMem] += points
         self.bonusMode = False
         
     def bonusStop(self):
@@ -195,44 +223,43 @@ async def on_message(text):
             print("calling team")
             report = "Invalid role!"
             current = text.channel.id
-            exist = False
-            for i in range(len(games)):
-                if current == games[i].getChannel():
-                    exist = True
-                    break
-            if exist:
-                if text.content.startswith('!team r'):
-                    role = get(text.guild.roles, name = 'Team red')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].redTeam.append(text.author)
-                if text.content.startswith('!team b'):
-                    role = get(text.guild.roles, name = 'Team blue')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].blueTeam.append(text.author)
-                if text.content.startswith('!team g'):
-                    role = get(text.guild.roles, name = 'Team green')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].greenTeam.append(text.author)
-                if text.content.startswith('!team o'):
-                    role = get(text.guild.roles, name = 'Team orange')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].orangeTeam.append(text.author)
-                if text.content.startswith('!team y'):
-                    role = get(text.guild.roles, name = 'Team yellow')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].yellowTeam.append(text.author)
-                if text.content.startswith('!team p'):
-                    role = get(text.guild.roles, name = 'Team purple')
-                    await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
-                    games[i].purpleTeam.append(text.author)
-            else:
-                report = "You need to start a game first! Use '!start' to start a game."
+            #exist = False
+            #for i in range(len(games)):
+                #if current == games[i].getChannel():
+                    #exist = True
+            if text.content.startswith('!team r'):
+                role = get(text.guild.roles, name = 'Team red')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].redTeam.append(text.author)
+            if text.content.startswith('!team b'):
+                role = get(text.guild.roles, name = 'Team blue')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].blueTeam.append(text.author)
+            if text.content.startswith('!team g'):
+                role = get(text.guild.roles, name = 'Team green')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].greenTeam.append(text.author)
+            if text.content.startswith('!team o'):
+                role = get(text.guild.roles, name = 'Team orange')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].orangeTeam.append(text.author)
+            if text.content.startswith('!team y'):
+                role = get(text.guild.roles, name = 'Team yellow')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].yellowTeam.append(text.author)
+            if text.content.startswith('!team p'):
+                role = get(text.guild.roles, name = 'Team purple')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+                #games[i].purpleTeam.append(text.author)
+                    #break
+            #if exist == False:
+                #report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
     
         if text.content.startswith('!start'):
@@ -386,22 +413,22 @@ async def on_message(text):
                     areTeams = False
                     desc = "Score after TU# " + str(games[i].TUnum) + ": "
                     if games[i].teamExist(games[i].redTeam):
-                        desc += "\r\nRed team: " + str(games[i].teamScore(games[i].redTeam))
+                        desc += "\r\nRed team: " + str(games[i].teamScore(games[i].redTeam, games[i].redBonus))
                         areTeams = True
                     if games[i].teamExist(games[i].blueTeam):
-                        desc += "\r\nBlue team: " + str(games[i].teamScore(games[i].blueTeam))
+                        desc += "\r\nBlue team: " + str(games[i].teamScore(games[i].blueTeam, games[i].blueBonus))
                         areTeams = True
                     if games[i].teamExist(games[i].greenTeam):
-                        desc += "\r\nGreen team: " + str(games[i].teamScore(games[i].greenTeam))
+                        desc += "\r\nGreen team: " + str(games[i].teamScore(games[i].greenTeam, games[i].greenBonus))
                         areTeams = True
                     if games[i].teamExist(games[i].orangeTeam):
-                        desc += "\r\nOrange team: " + str(games[i].teamScore(games[i].orangeTeam))
+                        desc += "\r\nOrange team: " + str(games[i].teamScore(games[i].orangeTeam, games[i].orangeBonus))
                         areTeams = True
                     if games[i].teamExist(games[i].yellowTeam):
-                        desc += "\r\nYellow team: " + str(games[i].teamScore(games[i].yellowTeam))
+                        desc += "\r\nYellow team: " + str(games[i].teamScore(games[i].yellowTeam, games[i].yellowBonus))
                         areTeams = True
                     if games[i].teamExist(games[i].purpleTeam):
-                        desc += "\r\nPurple team: " + str(games[i].teamScore(games[i].purpleTeam))
+                        desc += "\r\nPurple team: " + str(games[i].teamScore(games[i].purpleTeam, games[i].purpleBonus))
                         areTeams = True
                     if areTeams:
                         desc += "\r\n\r\nIndividuals:"
