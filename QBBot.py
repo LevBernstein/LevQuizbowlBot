@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.4.1
+#Version: 1.4.2
 
 
 import discord
@@ -336,11 +336,15 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if len(games) != 0 and (isInt(text.content) or text.content.startswith(':neg:')): #Assigns points. Checks len games to avoid unnecessary calls.
+        if len(games) != 0 and (isInt(text.content) or text.content.startswith('<:neg:') or text.content.startswith('<:ten:') or text.content.startswith('<:power:')): #Assigns points. Checks len games to avoid unnecessary calls.
             print("calling points")
             print(text.content + " is an int")
-            if text.content.startswith(':neg:'):
+            if text.content.startswith('<:neg:'):
                 text.content = "-5"
+            if text.content.startswith('<:ten:'):
+                text.content = "10"
+            if text.content.startswith('<:power:'):
+                text.content = "15"
             current = text.channel.id
             exist = False
             for i in range(len(games)):
@@ -454,7 +458,7 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
     
-        if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz'):
+        if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz') or text.content.startswith(':bee:') or text.content.startswith('<:buzz:'):
             print("calling buzz")
             current = text.channel.id
             exist = False
