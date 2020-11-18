@@ -336,9 +336,11 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if len(games) != 0 and isInt(text.content): #Assigns points. Checks len games to avoid unnecessary calls.
+        if len(games) != 0 and (isInt(text.content) or text.content.startswith(':neg:')): #Assigns points. Checks len games to avoid unnecessary calls.
             print("calling points")
             print(text.content + " is an int")
+            if text.content.startswith(':neg:'):
+                text.content = "-5"
             current = text.channel.id
             exist = False
             for i in range(len(games)):
