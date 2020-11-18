@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.4.0
+#Version: 1.4.1
 
 
 import discord
@@ -379,7 +379,7 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    if text.author.id == games[i].reader.id:
+                    if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
                         games[i].bonusEnabled = not games[i].bonusEnabled
                         if games[i].bonusEnabled:
                             await text.channel.send("Enabled bonus mode.")
@@ -445,7 +445,7 @@ async def on_message(text):
                     limit = len(names)
                     print("Length = " + str(limit))
                     for i in range(limit):
-                        emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=False)
+                        emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=True)
                     await text.channel.send(embed=emb)
                     break
             if exist == False:
@@ -538,7 +538,7 @@ async def on_message(text):
             emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=True)
             emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=True)
             emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=True)
-            emb.add_field(name= "!bonusmode", value= "Disables or enables. Bonuses are enabled by default.", inline=True)
+            emb.add_field(name= "!bonusmode", value= "Disables or enables bonuses. Bonuses are enabled by default.", inline=True)
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             await text.channel.send(embed=emb)
