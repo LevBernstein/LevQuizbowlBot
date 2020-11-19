@@ -1,7 +1,6 @@
 # Lev's Quizbowl Bot
 
-A Discord bot designed for playing Quizbowl,
-written in Python.
+A Discord bot designed for playing Quizbowl, written in Python.
 
 Originally created for use in the Quiz Bowl at NYU Discord server. 
 
@@ -46,12 +45,18 @@ You will also need to make the following roles:
 
 All of them must be lower in the role hierarchy than the bot's highest role.
 
+In addition to giving points by entering numbers, the bot allows you to give points through Discord emojis.
+These emojis must have the names :neg:, :power:, and :ten:. You can also buzz with :buzz:.
+These are not standard Discord emotes, so if you want to have them as an option for points or buzzing, you must make them in your server.
+Provided in the "emoji" folder are images used for those emotes in the NYU QB server, as created by Theresa Nyowheoma.
+Feel free to use those or make your own images for the emotes.
 
 ### Running the bot
 
 In the *nix command line, cd to the directory containing QBBot.py. Then run "python3 QBBot.py"
 
-The bot outputs a lot to the command line, just because I like having a lot of information available. You can comment out the print statements if they annoy.
+The bot outputs a lot to the command line, just because I like having a lot of information available.
+You can comment out the print statements if they annoy you.
 
 ## To-Do
 
@@ -63,11 +68,13 @@ The bot outputs a lot to the command line, just because I like having a lot of i
 
 * Record logs for each game (as a precursor to score exporting)
 
-* <strike>Teams.</strike> Implemented as of version 1.4.0.
+* <strike>Allow emoji for points/buzzing.</strike> Implemented in version 1.4.3.
 
-* <strike>Bonuses.</strike> Implemented as of version 1.3.0.
+* <strike>Teams.</strike> Implemented in version 1.4.0.
 
-* <strike>Tossup number tracking.</strike> Implemented as of version 1.2.1.
+* <strike>Bonuses.</strike> Implemented in version 1.3.0.
+
+* <strike>Tossup number tracking.</strike> Implemented in version 1.2.1.
 
 ## License
 This program is free software: you can redistribute it and/or modify
