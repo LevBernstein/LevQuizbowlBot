@@ -1,6 +1,6 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.4.2
+#Version: 1.4.3
 
 
 import discord
