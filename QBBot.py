@@ -1,28 +1,53 @@
 #Lev's Quizbowl Bot
 #Author: Lev Bernstein
-#Version: 1.4.3
+#Version: 1.4.5
+#This bot is designed to be a user-friendly 
 
 
-import discord
-from discord.ext import commands
-from discord.utils import get
 from time import sleep
+from datetime import datetime
 import random as random
 import operator
 from collections import deque, OrderedDict
 
+import discord
+from discord.ext import commands
+from discord.utils import get
 
-f = open("token.txt", "r") #in token.txt, just put in your own discord api token
+f = open("token.txt", "r") # in token.txt, just put in your own discord api token
 token = f.readline()
 
 client = discord.Client()
 
-def isInt(st): #checks if entered message is actually the points being awarded
+def isInt(st):
+    """Checks if an entered string would be a valid number of points to assign."""
+    if st.startswith('<:neg:') or st.startswith('<:ten:') or st.startswith('<:power:'):
+        return True
     if st[0] == '-' or st[0] == '+':
         return st[1:].isdigit()
     return st.isdigit()
 
-class Instance: #instance of an active game. Every channel a game is run in gets its own instance. You cannot have more than one game per channel.
+
+#############################################################
+# Instance(self, channel)
+# This class is an instance of an active game of Quizbowl.
+# Every channel in which a game is run gets its own instance.
+# You cannot have more than one Instance per channel.
+# Parameters: channel is the id of the Discord channel in which the instance is run.
+# Local variables:
+#   Tunum: Represents the number of completed TUs read. Advances after points are awarded for a TU or a TU goes dead (!dead).
+#   scores: Dictionary mapping players to the number of points they have.
+#   buzzes: Queue containing players' buzzes. After a player negs, they are popped from the queue and it moves on to the next buzz.
+#   buzzed: Queue containing players who have already buzzed. If a player is in this queue, they cannot buzz again. You can clear this with !clear (or !dead, which also advances Tunum).
+#   active: Boolean that tracks whether there are currently valid buzzes on a TU.
+#   reader: Discord Member who is reading/moderating a given Instance.
+#   bonusEnabled: Boolean that controls whether the bot will prompt for bonus points. Can be toggled with !bonusmode.
+#   bonusMode: Boolean that tracks if reader is currently reading a bonus. Automatically set upon points being awarded for a TU or bonus.
+#   lastBonusMem: Discord Member who last gained points on a TU. If they are on a team, whatever they get on the bonus is given to their team. Otherwise, it's added to their score.
+#   red/blue/.../purpleTeam: Arrays of Discord Members from each team.
+#   red/blue/.../purpleNeg: Booleans tracking if a team is locked out from buzzing due to a member of their team negging.
+#   red/blue/.../purpleBonus: The number of points each team has earned on bonuses so far.
+class Instance: # instance of an active game. Every channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
         self.TUnum = 0
@@ -30,8 +55,8 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.buzzes = deque()
         self.buzzed = deque()
         self.active = False
-        self.reader = None #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
-        self.bonusEnabled = True 
+        self.reader = None  #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
+        self.bonusEnabled = True
         self.bonusMode = False
         self.lastBonusMem = None
         self.redTeam = []
@@ -54,12 +79,11 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.purpleBonus = 0
 
     def getChannel(self):
+        """Return the channel of a given Instance."""
         return self.channel
-
-    def toString(self):
-        print(self.channel)
         
     def buzz(self, mem):
+        """Adds a buzzing player to the buzzes and buzzed arrays, if they are allowed to buzz."""
         if self.hasBuzzed(mem):
             print("Extra")
         else:
@@ -69,18 +93,21 @@ class Instance: #instance of an active game. Every channel a game is run in gets
             print("Appended")
     
     def hasBuzzed(self, mem):
+        """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise."""
         if mem in self.buzzed:
             return True
         else:
             return False
     
     def clear(self):
+        """Clears the buzzes and buzzed arrays, allowing all players to buzz in once more."""
         print("Clearing...")
         self.buzzes = deque()
         self.buzzed = deque()
         self.unlock()
         
     def unlock(self):
+        """Allows all teams to buzz in again."""
         print("Unlocking...")
         self.redNeg = False
         self.blueNeg = False
@@ -90,7 +117,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.purpleNeg = False
     
     def canBuzz(self, mem):
-        #TODO add this to the buzz method AND to the neg part of the any integer method
+        """Checks if a player is allowed to buzz. This exists alongside hasBuzzed() to allow for team functionality."""
         conditions = (
             (mem in self.redTeam and self.redNeg==True),
             (mem in self.blueTeam and self.blueNeg==True),
@@ -104,24 +131,29 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         else:
             return True
     
-    def teamScore(self, team, teamBonus): #pass this one of the teams, UNTESTED. Requires further team implementation.
-        #TODO test this
+    def teamScore(self, team, teamBonus):
+        """Returns a team's total score, including bonus points."""
         total = teamBonus
         for mem in team:
             if mem in self.scores:
                 total += self.scores[mem]
         return total
     
-    def teamExist(self, team): #use this to check if a team has members
+    def teamExist(self, team):
+        """Checks if a given team has members"""
         if len(team) > 0:
             return True
         return False
     
     def gain(self, points):
+        """Awards points to whomever last buzzed in. 
+        If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
+        If the points awarded is a negative number or 0, they have gotten a TU incorrect, so it adds that to the individual's score and does not advance TUnum. Returns false.
+        """
         awarded = False
         if self.active == True:
             mem = self.buzzes.popleft()
-            if points > 0: #Someone got a TU correct.
+            if points > 0: # Someone got a TU correct.
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
                     self.active = False
@@ -132,10 +164,10 @@ class Instance: #instance of an active game. Every channel a game is run in gets
                     self.active = False
                     self.clear()
                     awarded = True
-                self.TUnum +=1 #If a positive # of points has been assigned, that means someone got the TU correct. Advance the count.
+                self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
                 if self.bonusEnabled:
                     self.lastBonusMem = mem
-                    self.bonusMode = True
+                    self.bonusMode = True # Move on to awarding bonus points
             else: #Someone got a 0 or a -5.
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
@@ -162,6 +194,7 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         return awarded
 
     def bonusGain(self, points):
+        """Awards bonus points, either to the team or to the individual if playing without teams."""
         if not self.bonusEnabled:
             return
         if not self.bonusMode:
@@ -192,34 +225,37 @@ class Instance: #instance of an active game. Every channel a game is run in gets
         self.bonusMode = False
         
     def bonusStop(self):
+        """Kills an active bonus."""
         if self.bonusEnabled:
             self.lastBonusMem = None
             self.bonusMode = False
         else:
             return
     
-games = [] #Array holding all active games
+games = [] # Array holding all active games
 
 
 @client.event
 async def on_ready():
+    """Ready message for when the bot is online."""
     await client.change_presence(activity=discord.Game(name='Ready to play!'))
     print("Quizbowl Bot online!")
 
 @client.event
 async def on_message(text):
+    """Handles all commands the bot considers valid. Scans all messages, so long as they are not from bots, to see if those messages start with a valid command."""
     report = ""
     text.content=text.content.lower()
     #print(text.content)
     if text.author.bot == False:
-        if (text.content.startswith('!summon') or text.content.startswith('!call')):
+        if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
             if text.author.guild_permissions.administrator:
                 await text.channel.send("@everyone Time for practice!")
             else:
                 await text.channel.send("This command is only usable by server admins!")
         
-        if text.content.startswith('!team '): #Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+        if text.content.startswith('!team '): # Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
             print("calling team")
             report = "Invalid role!"
             current = text.channel.id
@@ -262,7 +298,7 @@ async def on_message(text):
                 #report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
     
-        if text.content.startswith('!start'):
+        if text.content.startswith('!start') or text.content.startswith('!begin'):
             print("calling start")
             current = text.channel.id
             exist = False
@@ -275,14 +311,14 @@ async def on_message(text):
                 x = Instance(current)
                 x.reader = text.author
                 print(x.getChannel())
-                role = get(text.guild.roles, name = 'reader') #The bot needs you to make a role called "reader" in order to function.
+                role = get(text.guild.roles, name = 'reader') # The bot needs you to make a role called "reader" in order to function.
                 await text.author.add_roles(role)
                 games.append(x)
             else:
                 report = "You already have an active game in this channel."
             await text.channel.send(report)
         
-        if text.content.startswith('!end'):
+        if text.content.startswith('!end') or text.content.startswith('!stop'):
             print("calling end")
             current = text.channel.id
             exist = False
@@ -336,10 +372,10 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if len(games) != 0 and (isInt(text.content) or text.content.startswith('<:neg:') or text.content.startswith('<:ten:') or text.content.startswith('<:power:')): #Assigns points. Checks len games to avoid unnecessary calls.
+        if len(games) != 0 and isInt(text.content): # Assigns points. Checks len games to avoid unnecessary calls.
             print("calling points")
             print(text.content + " is an int")
-            if text.content.startswith('<:neg:'):
+            if text.content.startswith('<:neg:'): # This and the next two conditional check to see if someone is using a valid emoji to assign points. While, to the user, an emoji looks like :emojiName:, to the bot it is also wrapped in <>.
                 text.content = "-5"
             if text.content.startswith('<:ten:'):
                 text.content = "10"
@@ -352,7 +388,7 @@ async def on_message(text):
                     exist = True
                     #reader = get(text.guild.roles, name = 'reader')
                     if text.author.id == games[i].reader.id:
-                        if games[i].bonusEnabled == False: #bonuses disabled
+                        if games[i].bonusEnabled == False:
                             if games[i].gain(int(text.content)):
                                 await text.channel.send("Awarded points. Next TU.")
                             else:
@@ -378,7 +414,7 @@ async def on_message(text):
                                 await text.channel.send("Awarded bonus points. Next TU.")
                     break
         
-        if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'): #Toggles if bonus mode is enabled. It is enabled by default.
+        if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'): # Toggles whether bonus mode is enabled. It is enabled by default.
             print("calling bonusmode")
             current = text.channel.id
             exist = False
@@ -395,7 +431,7 @@ async def on_message(text):
             if exist == False:
                 await text.channel.send("You need to start a game first! Use '!start' to start a game.")
         
-        if text.content.startswith('!bstop'): #Ends current bonus round. Use this to kill a bonus without giving points.
+        if text.content.startswith('!bstop'): # Ends current bonus round. Use this to kill a bonus without giving points.
             print("calling bstop")
             current = text.channel.id
             exist = False
@@ -418,6 +454,8 @@ async def on_message(text):
                     exist = True
                     areTeams = False
                     desc = "Score after TU# " + str(games[i].TUnum) + ": "
+                    
+                    #The following seven conditionals modify the scoreboard to include team scores, if those teams exist.
                     if games[i].teamExist(games[i].redTeam):
                         desc += "\r\nRed team: " + str(games[i].teamScore(games[i].redTeam, games[i].redBonus))
                         areTeams = True
@@ -438,9 +476,10 @@ async def on_message(text):
                         areTeams = True
                     if areTeams:
                         desc += "\r\n\r\nIndividuals:"
+                        
                     emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                     for x,y in games[i].scores.items():
-                        if x.nick == 'none' or x.nick == 'None' or x.nick == None:
+                        if x.nick == 'none' or x.nick == 'None' or x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
                             diction[x.name] = y
                         else:
                             diction[x.nick] = y
@@ -467,7 +506,7 @@ async def on_message(text):
                     exist = True
                     #reader = get(text.guild.roles, name = 'reader')
                     
-                    #This block handles all team assignment that was done before the game started.
+                    # This block handles all team assignment that was done before the game started.
                     red = get(text.guild.roles, name = 'Team red')
                     if red in text.author.roles and not text.author in games[i].redTeam:
                         games[i].redTeam.append(text.author)
@@ -506,7 +545,7 @@ async def on_message(text):
                                 else:
                                     games[i].buzz(text.author)
                                     print("Buzzed!")
-                            else: #Might want to remove this if it causes too much clutter.
+                            else: # Might want to remove this if it causes too much clutter.
                                 await text.channel.send("Your team is locked out of buzzing, " + str(text.author.mention) + ".")
                     else:
                         await text.channel.send("We are currently playing a bonus. You cannot buzz.")
@@ -551,7 +590,7 @@ async def on_message(text):
             
             #await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
 
-        elif text.content.startswith('!tu'): #elif not if because otherwise !tutorial calls this too
+        elif text.content.startswith('!tu') or text.content.startswith('!tunum'): # elif because otherwise !tutorial calls this too
             print("calling tu")
             current = text.channel.id
             exist = False
@@ -565,6 +604,16 @@ async def on_message(text):
 
         if text.content.startswith('!export'):
             #TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir
-            pass
+            exist = False
+            current = text.channel.id
+            for i in range(len(games)):
+                if current == games[i].getChannel():
+                    exist = True
+                    exportedTime = str(datetime.now())[:-5]
+                    emb = discord.Embed(title="Exported scoresheet at " + exportedTime + ".", description="", color=0x57068C)
+                    emb.add_field(name = "This feature has not been implemented yet!", value= "Make sure to check https://github.com/LevBernstein/LevQuizbowlBot for updates!", inline=False)
+                    await text.channel.send(embed=emb)
+            if exist == False:
+                await text.channel.send("You need to start a game first! Use '!start' to start a game.")
 
 client.run(token)
