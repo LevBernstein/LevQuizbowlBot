@@ -1,7 +1,8 @@
-#Lev's Quizbowl Bot
-#Author: Lev Bernstein
-#Version: 1.4.5
-#This bot is designed to be a user-friendly 
+# Lev's Quizbowl Bot
+# Author: Lev Bernstein
+# Version: 1.4.6
+# This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
+# All commands are documented; if you need any help understanding them, try the command !tutorial.
 
 
 from time import sleep
@@ -55,7 +56,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.buzzes = deque()
         self.buzzed = deque()
         self.active = False
-        self.reader = None  #TODO new reader method, in case the reader has to leave mid-match. Will also remove the new reader from scores and subtract their score from teamscores.
+        self.reader = None
         self.bonusEnabled = True
         self.bonusMode = False
         self.lastBonusMem = None
@@ -316,6 +317,26 @@ async def on_message(text):
                 games.append(x)
             else:
                 report = "You already have an active game in this channel."
+            await text.channel.send(report)
+        
+        if text.content.startswith('!newreader'):
+            print("calling newreader")
+            current = text.channel.id
+            exist = False
+            for i in range(len(games)):
+                if current == games[i].getChannel():
+                    exist = True
+                    if text.author == games[i].reader:
+                        report + "You are already the reader, " + text.author.mention + "!"
+                    else:
+                        report = "Removed reader role from " + games[i].reader.mention + ". Gave reader role to " + text.author.mention + "."
+                        role = get(text.guild.roles, name = 'reader')
+                        await games[i].reader.remove_roles(role)
+                        games[i].reader = text.author
+                        await text.author.add_roles(role)
+                    break
+            if exist ==False:
+                report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
         if text.content.startswith('!end') or text.content.startswith('!stop'):
@@ -585,6 +606,7 @@ async def on_message(text):
             emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=True)
             emb.add_field(name= "!bonusmode", value= "Disables or enables bonuses. Bonuses are enabled by default.", inline=True)
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
+            emb.add_field(name= "!newreader", value= "Removes the reader role from the old reader and designates you the new reader.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             await text.channel.send(embed=emb)
             
