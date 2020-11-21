@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.4.7
+# Version: 1.4.8
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 
@@ -464,13 +464,14 @@ async def on_message(text):
                             else:
                                 newBuzzed.append(games[i].buzzed.popleft())
                         games[i].buzzed = newBuzzed
-                        await text.channel.send("Withdrew " + text.author.mention + "'s buzz.")
+                        report = "Withdrew " + text.author.mention + "'s buzz. "
                         while len(games[i].buzzes) > 0:
                             if games[i].canBuzz(games[i].buzzes[0]):
-                                await text.channel.send((games[i].buzzes[0]).mention + " buzzed. Pinging reader: " + str(games[i].reader.mention))
+                                report += (games[i].buzzes[0]).mention + " buzzed. Pinging reader: " + str(games[i].reader.mention)
                                 break
                             else:
                                 games[i].buzzes.popleft()
+                        await text.channel.send(report)
                         break
                     else:
                         await text.channel.send("Only the currently recognized player can withdraw.")
