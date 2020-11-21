@@ -3,6 +3,9 @@
 # Version: 1.4.8
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
+# This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
+# you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
+# make a pull request on the bot's Github page (https://github.com/LevBernstein/LevQuizbowlBot).
 
 
 from time import sleep
@@ -22,6 +25,8 @@ client = discord.Client()
 
 def isInt(st):
     """Checks if an entered string would be a valid number of points to assign."""
+    if len(st) == 0: # this conditional handles an issue with the bot trying to interpret attached images as strings
+        return False
     if st.startswith('<:neg:') or st.startswith('<:ten:') or st.startswith('<:power:'):
         return True
     if st[0] == '-' or st[0] == '+':
@@ -85,7 +90,9 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.purpleBonus = 0
 
     def getChannel(self):
-        """Return the channel of a given Instance."""
+        """Return the channel of a given Instance. 
+        TODO For the sake of proper encapsulation, to make my CS101 professor proud, I should switch to method calls like this for every local variable.
+        """
         return self.channel
         
     def buzz(self, mem):
@@ -267,10 +274,10 @@ async def on_ready():
 async def on_message(text):
     """Handles all commands the bot considers valid. Scans all messages, so long as they are not from bots, to see if those messages start with a valid command."""
     report = ""
-    text.content=text.content.lower()
+    text.content=text.content.lower() # for ease of use, all commands are lowercase, and all messages scanned are converted to lowercase.
     current = text.channel.id
     exist = False
-    #print(text.content)
+    print(str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content)
     if text.author.bot == False:
         if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
@@ -278,48 +285,6 @@ async def on_message(text):
                 await text.channel.send("@everyone Time for practice!")
             else:
                 await text.channel.send("This command is only usable by server admins!")
-        
-        if text.content.startswith('!team '): # Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
-            print("calling team")
-            report = "Invalid role!"
-            #exist = False
-            #for i in range(len(games)):
-                #if current == games[i].getChannel():
-                    #exist = True
-            if text.content.startswith('!team r'):
-                role = get(text.guild.roles, name = 'Team red')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].redTeam.append(text.author)
-            if text.content.startswith('!team b'):
-                role = get(text.guild.roles, name = 'Team blue')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].blueTeam.append(text.author)
-            if text.content.startswith('!team g'):
-                role = get(text.guild.roles, name = 'Team green')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].greenTeam.append(text.author)
-            if text.content.startswith('!team o'):
-                role = get(text.guild.roles, name = 'Team orange')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].orangeTeam.append(text.author)
-            if text.content.startswith('!team y'):
-                role = get(text.guild.roles, name = 'Team yellow')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].yellowTeam.append(text.author)
-            if text.content.startswith('!team p'):
-                role = get(text.guild.roles, name = 'Team purple')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
-                #games[i].purpleTeam.append(text.author)
-                    #break
-            #if exist == False:
-                #report = "You need to start a game first! Use '!start' to start a game."
-            await text.channel.send(report)
     
         if text.content.startswith('!start') or text.content.startswith('!begin'):
             print("calling start")
@@ -506,6 +471,35 @@ async def on_message(text):
                         await text.channel.send("Killed active bonus. Next TU.")
                     break
         
+        if text.content.startswith('!team '): # Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+            print("calling team")
+            report = "Invalid role!"
+            if text.content.startswith('!team r'):
+                role = get(text.guild.roles, name = 'Team red')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            if text.content.startswith('!team b'):
+                role = get(text.guild.roles, name = 'Team blue')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            if text.content.startswith('!team g'):
+                role = get(text.guild.roles, name = 'Team green')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            if text.content.startswith('!team o'):
+                role = get(text.guild.roles, name = 'Team orange')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            if text.content.startswith('!team y'):
+                role = get(text.guild.roles, name = 'Team yellow')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            if text.content.startswith('!team p'):
+                role = get(text.guild.roles, name = 'Team purple')
+                await text.author.add_roles(role)
+                report = "Gave you the role, " + text.author.mention + "."
+            await text.channel.send(report)
+        
         if text.content.startswith('!score'):
             print("calling score")
             names = []
@@ -563,7 +557,6 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    #reader = get(text.guild.roles, name = 'reader')
                     
                     # This block handles all team assignment that was done before the game started.
                     red = get(text.guild.roles, name = 'Team red')
@@ -650,8 +643,6 @@ async def on_message(text):
             emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
             await text.channel.send(embed=emb)
             
-            #await text.channel.send('Valid commands: \r\n "!start" starts a new game. \r\n "buzz" buzzes in. \r\n Enter any positive or negative whole number after someone buzzes to assign points. \r\n "!clear" clears buzzers after a TU goes dead. \r\n "!score" displays the score, sorted from highest to lowest. \r\n "!end" ends the active game. \r\n "!team [red/blue/green/orange/yellow/purple]" assigns you the team role corresponding to the color you entered. \r\n "!call" or "!summon" mentions everyone in the server and informs them it is time for practice \r\n "!github" gives you a link to this bot\'s github page. \r\n "!report" gives you a link to this bot\'s issue-reporting page. ')
-
         elif text.content.startswith('!tu') or text.content.startswith('!tunum'): # elif because otherwise !tutorial calls this too
             print("calling tu")
             for i in range(len(games)):
@@ -663,7 +654,7 @@ async def on_message(text):
             await text.channel.send(report)
 
         if text.content.startswith('!export'):
-            #TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir
+            #TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir.
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
