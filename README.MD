@@ -66,7 +66,7 @@ You can comment out the print statements if they annoy you.
 
 * <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
 
-* Record logs for each game (as a precursor to score exporting)
+* <strike>Record logs for each game (as a precursor to score exporting)</strike> Implemented in version 1.5.0.
 
 * <strike>Allow emoji for points/buzzing.</strike> Implemented in version 1.4.3.
 
