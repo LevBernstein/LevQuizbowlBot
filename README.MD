@@ -64,7 +64,7 @@ You can comment out the print statements if they annoy you.
 
 * Score exporting through .csv files.
 
-* Command that sets a new reader, in case the reader has to leave mid-match.
+* <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
 
 * Record logs for each game (as a precursor to score exporting)
 
