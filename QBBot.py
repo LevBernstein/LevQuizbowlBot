@@ -28,6 +28,11 @@ def isInt(st):
         return st[1:].isdigit()
     return st.isdigit()
 
+def isBuzz(st):
+    """Checks if an entered string is a valid buzz."""
+    if st.startswith('buzz') or st.startswith('bz') or st.startswith('buz') or st.startswith('!buzz') or st.startswith('!bz') or st.startswith('!buz') or st.startswith(':bee:') or st.startswith('<:buzz:'):
+        return True
+    return False
 
 #############################################################
 # Instance(self, channel)
@@ -552,7 +557,7 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
     
-        if text.content.startswith('buzz') or text.content.startswith('bz') or text.content.startswith('buz') or text.content.startswith('!buzz') or text.content.startswith('!bz') or text.content.startswith('!buz') or text.content.startswith(':bee:') or text.content.startswith('<:buzz:'):
+        if isBuzz(text.content):
             print("calling buzz")
             for i in range(len(games)):
                 if current == games[i].getChannel():
