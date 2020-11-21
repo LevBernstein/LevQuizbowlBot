@@ -1,1 +1,2 @@
-This folder will be automatically filled with logs from startin games. The .gitignore files prevents those games from being added to github.
+This folder will automatically be filled with log files from each game of Quizbowl.
+The .gitignore prevents those logs from being added to GitHub.
