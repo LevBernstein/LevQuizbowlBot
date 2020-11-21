@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.0
+# Version: 1.5.1
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -282,6 +282,7 @@ async def on_message(text):
     current = text.channel.id
     exist = False
     heldGame = None
+    botSpoke = False
     print(str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content)
     if text.author.bot == False:
         for i in range(len(games)):
@@ -292,12 +293,15 @@ async def on_message(text):
         
         if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
+            botSpoke = True
             if text.author.guild_permissions.administrator:
-                await text.channel.send("@everyone Time for practice!")
+                report = "@everyone Time for practice!"
             else:
-                await text.channel.send("This command is only usable by server admins!")
+                report = "This command is only usable by server admins!"
+            await text.channel.send(report)
     
         if text.content.startswith('!start') or text.content.startswith('!begin'):
+            botSpoke = True
             print("calling start")
             if exist:
                 report = "You already have an active game in this channel."
@@ -315,6 +319,7 @@ async def on_message(text):
         
         if text.content.startswith('!newreader'):
             print("calling newreader")
+            botSpoke = True
             if exist:
                 if text.author == heldGame.reader:
                     report + "You are already the reader, " + text.author.mention + "!"
@@ -330,6 +335,7 @@ async def on_message(text):
         
         if text.content.startswith('!end') or text.content.startswith('!stop'):
             print("calling end")
+            botSpoke = True
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
@@ -348,6 +354,7 @@ async def on_message(text):
                 
         if text.content.startswith('!dead'):
             print("calling dead")
+            botSpoke = True
             if exist:
                 if text.author.id == heldGame.reader.id:
                     heldGame.clear()
@@ -361,6 +368,7 @@ async def on_message(text):
         
         if text.content.startswith('!clear'):
             print("calling clear")
+            botSpoke = True
             if exist:
                 if text.author.id == heldGame.reader.id:
                     heldGame.clear()
@@ -381,15 +389,16 @@ async def on_message(text):
             if text.content.startswith('<:power:'):
                 text.content = "15"
             if exist:
+                botSpoke = True
                 #reader = get(text.guild.roles, name = 'reader')
                 if text.author.id == heldGame.reader.id:
                     if heldGame.bonusEnabled == False:
                         if heldGame.gain(int(text.content)):
-                            await text.channel.send("Awarded points. Next TU.")
+                            report = "Awarded points. Next TU."
                         else:
                             while len(heldGame.buzzes) > 0:
                                 if heldGame.canBuzz(heldGame.buzzes[0]):
-                                    await text.channel.send((heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention))
+                                    report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
                                     break
                                 else:
                                     heldGame.buzzes.popleft()
@@ -401,20 +410,21 @@ async def on_message(text):
                                 if getTeam != "None":
                                     report += "Bonus is for " + getTeam + ". "
                                 report +=  "Awaiting bonus points."
-                                await text.channel.send(report)
                             else:
                                 while len(heldGame.buzzes) > 0:
                                     if heldGame.canBuzz(heldGame.buzzes[0]):
-                                        await text.channel.send((heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention))
+                                        report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
                                         break
                                     else:
                                         heldGame.buzzes.popleft()
                         else: #bonusMode true
                             heldGame.bonusGain(int(text.content))
-                            await text.channel.send("Awarded bonus points. Next TU.")
+                            report = "Awarded bonus points. Next TU."
+                await text.channel.send(report)
         
         if text.content.startswith('wd') or text.content.startswith('!wd') or text.content.startswith('withdraw') or text.content.startswith('!withdraw'):
             print("calling withdraw")
+            botSpoke = True
             if exist:
                 if heldGame.buzzes[0] == text.author:
                     heldGame.buzzes.popleft()
@@ -432,38 +442,43 @@ async def on_message(text):
                             break
                         else:
                             heldGame.buzzes.popleft()
-                    await text.channel.send(report)
                 else:
-                    await text.channel.send("Only the currently recognized player can withdraw.")
+                    report = "Only the currently recognized player can withdraw."
             else:
-                await text.channel.send("You need to start a game first! Use '!start' to start a game.")
+                report = "You need to start a game first! Use '!start' to start a game."
+            await text.channel.send(report)
         
         if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'): # Toggles whether bonus mode is enabled. It is enabled by default.
             print("calling bonusmode")
+            botSpoke = True
             if exist:
                 if text.author.id == heldGame.reader.id or text.author.guild_permissions.administrator:
                     heldGame.bonusStop()
                     heldGame.bonusEnabled = not heldGame.bonusEnabled
                     if heldGame.bonusEnabled:
-                        await text.channel.send("Enabled bonus mode.")
+                        report = "Enabled bonus mode."
                     else:
-                        await text.channel.send("Disabled bonus mode.")
+                        report = "Disabled bonus mode."
             else:
-                await text.channel.send("You need to start a game first! Use '!start' to start a game.")
+                report = "You need to start a game first! Use '!start' to start a game."
+            await text.channel.send(report)
         
         if text.content.startswith('!bstop'): # Ends current bonus round. Use this to kill a bonus without giving points.
             print("calling bstop")
+            botSpoke = True
             if exist:
                 if text.author.id == heldGame.reader.id:
                     heldGame.bonusStop()
-                    await text.channel.send("Killed active bonus. Next TU.")
+                    report = "Killed active bonus. Next TU."
                 else:
                     report = "You are not the reader!"
             else:
-                await text.channel.send("You need to start a game first! Use '!start' to start a game.")
+                report = "You need to start a game first! Use '!start' to start a game."
+            await text.channel.send(report)
         
         if text.content.startswith('!team '): # Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
             print("calling team")
+            botSpoke = True
             report = "Invalid role!"
             if text.content.startswith('!team r'):
                 role = get(text.guild.roles, name = 'Team red')
@@ -493,6 +508,7 @@ async def on_message(text):
         
         if text.content.startswith('!score'):
             print("calling score")
+            botSpoke = True
             names = []
             diction = {}
             if exist:
@@ -536,12 +552,14 @@ async def on_message(text):
                 for i in range(limit):
                     emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=True)
                 await text.channel.send(embed=emb)
+                report = "Embedded score."
             else:
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
     
         if isBuzz(text.content):
             print("calling buzz")
+            botSpoke = True
             if exist:
                 # This block handles all team assignment that was done before the game started.
                 red = get(text.guild.roles, name = 'Team red')
@@ -582,27 +600,34 @@ async def on_message(text):
                             else:
                                 heldGame.buzz(text.author)
                                 print("Buzzed!")
+                                # because I don't want the bot to say anything if you buzz when someone has been recognized, each conditional needs its own await send.
                         else: # Might want to remove this if it causes too much clutter.
-                            await text.channel.send("Your team is locked out of buzzing, " + str(text.author.mention) + ".")
+                            report = "Your team is locked out of buzzing, " + str(text.author.mention) + "."
+                            await text.channel.send(report)
                 else:
-                    await text.channel.send("We are currently playing a bonus. You cannot buzz.")
+                    report = "We are currently playing a bonus. You cannot buzz."
+                    await text.channel.send(report)
             else:
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
     
         if text.content.startswith('!github'):
             print("calling github")
+            botSpoke = True
             emb = discord.Embed(title="Lev's Quizbowl Bot", description="", color=0x57068C)
             #await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot")
             emb.add_field(name= "View this bot's source code at:", value= "https://github.com/LevBernstein/LevQuizbowlBot", inline=True)
             await text.channel.send(embed=emb)
+            report = "Embedded github."
             
         if text.content.startswith('!report'):
             print("calling report")
+            botSpoke = True
             emb = discord.Embed(title="Report bugs or suggest features", description="", color=0x57068C)
             #await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
             emb.add_field(name= "Report any issues at:", value= "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline=True)
             await text.channel.send(embed=emb)
+            report = "Embedded report."
     
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
@@ -626,6 +651,7 @@ async def on_message(text):
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
             await text.channel.send(embed=emb)
+            report = "Embedded tutorial."
             
         elif text.content.startswith('!tu') or text.content.startswith('!tunum'): # elif because otherwise !tutorial calls this too
             print("calling tu")
@@ -642,12 +668,17 @@ async def on_message(text):
                 emb = discord.Embed(title="Exported scoresheet at " + exportedTime + ".", description="", color=0x57068C)
                 emb.add_field(name = "This feature has not been implemented yet!", value= "Make sure to check https://github.com/LevBernstein/LevQuizbowlBot for updates!", inline=False)
                 await text.channel.send(embed=emb)
+                report = "Embedded export."
             else:
-                await text.channel.send("You need to start a game first! Use '!start' to start a game.")
+                report = "You need to start a game first! Use '!start' to start a game."
+                await text.channel.send(report)
         
         if exist:
             """Saves logs of valid commands in the log file"""
             newline = (str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content + "\r\n")
             heldGame.logFile.write(newline)
+            if botSpoke:
+                newline = "~~~BOT: " + report + "\r\n"
+                heldGame.logFile.write(newline)
         
 client.run(token)
