@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.1
+# Version: 1.5.2
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -18,9 +18,11 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
-f = open("token.txt", "r") # in token.txt, just put in your own discord api token
+# Setup
+f = open("token.txt", "r") # in token.txt, paste in your own Discord API token
 token = f.readline()
-
+g = open("templates/pfp.png", "rb")
+pic = g.read()
 generateLogs = True # if the log files are getting to be too much for you, set this to False
 
 client = discord.Client()
@@ -179,7 +181,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         return False
     
     def gain(self, points):
-        """Awards points to whomever last buzzed in. 
+        """Awards points to the player at the front of the buzzes queue. 
         If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
         If the points awarded is a negative number or 0, they have gotten a TU incorrect, so it adds that to the individual's score and does not advance TUnum. Returns false.
         """
@@ -272,6 +274,7 @@ games = [] # Array holding all active games
 async def on_ready():
     """Ready message for when the bot is online."""
     await client.change_presence(activity=discord.Game(name='Ready to play!'))
+    await client.user.edit(avatar=pic)
     print("Quizbowl Bot online!")
 
 @client.event
@@ -673,7 +676,7 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
         
-        if exist:
+        if exist and generateLogs:
             """Saves logs of valid commands in the log file"""
             newline = (str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content + "\r\n")
             heldGame.logFile.write(newline)
