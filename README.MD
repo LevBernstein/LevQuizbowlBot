@@ -48,7 +48,7 @@ All of them must be lower in the role hierarchy than the bot's highest role.
 In addition to giving points by entering numbers, the bot allows you to give points through Discord emojis.
 These emojis must have the names :neg:, :power:, and :ten:. You can also buzz with :buzz:.
 These are not standard Discord emotes, so if you want to have them as an option for points or buzzing, you must make them in your server.
-Provided in the "emoji" folder are images used for those emotes in the NYU QB server, as created by Theresa Nyowheoma.
+Provided in "templates/emoji" are images used for those emotes in the NYU QB server, as created by Theresa Nyowheoma.
 Feel free to use those or make your own images for the emotes.
 
 ### Running the bot
