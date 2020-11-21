@@ -93,7 +93,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.orangeBonus = 0
         self.yellowBonus = 0
         self.purpleBonus = 0
-        self.logFile = open(("gamelogs/log" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".txt"), "a")
+        self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
 
     def getChannel(self):
         """Return the channel of a given Instance. 
