@@ -60,13 +60,13 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* An undo method to undo the entering of scores and move back the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance
+* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance
 
 * Score exporting through .csv files.
 
 * <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
 
-* <strike>Record logs for each game (as a precursor to score exporting)</strike> Implemented in version 1.5.0.
+* <strike>Record logs for each game</strike> Implemented in version 1.5.0.
 
 * <strike>Allow emoji for points/buzzing.</strike> Implemented in version 1.4.3.
 
