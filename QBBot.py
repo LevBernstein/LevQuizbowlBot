@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.3
+# Version: 1.5.4
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -302,6 +302,51 @@ async def on_message(text):
                 heldGame = games[i]
                 break
         
+        if text.content.startswith('!setup'):
+            if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
+                # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
+                willHoist = True
+                if not get(text.guild.roles, name = 'reader'):
+                    await text.guild.create_role(name = 'reader', colour = discord.Colour(0x01ffdd), hoist = willHoist) # Hoist makes it so that this role is displayed separately on the sidebar.
+                    print("Created reader.")
+                if not get(text.guild.roles, name = 'Team red'):
+                    await text.guild.create_role(name = 'Team red', colour = discord.Colour(0xf70a0a), hoist = willHoist)
+                    print("Created Team red.")
+                if not get(text.guild.roles, name = 'Team blue'):
+                    await text.guild.create_role(name = 'Team blue', colour = discord.Colour(0x009ef7), hoist = willHoist)
+                    print("Created Team blue.")
+                if not get(text.guild.roles, name = 'Team green'):
+                    await text.guild.create_role(name = 'Team green', colour = discord.Colour(0x7bf70b), hoist = willHoist)
+                    print("Created Team green.")
+                if not get(text.guild.roles, name = 'Team orange'):
+                    await text.guild.create_role(name = 'Team orange', colour = discord.Colour(0xff6000), hoist = willHoist)
+                    print("Created Team orange.")
+                if not get(text.guild.roles, name = 'Team yellow'):
+                    await text.guild.create_role(name = 'Team yellow', colour = discord.Colour(0xfeed0e), hoist = willHoist)
+                    print("Created Team yellow.")
+                if not get(text.guild.roles, name = 'Team purple'):
+                    await text.guild.create_role(name = 'Team purple', colour = discord.Colour(0xb40eed), hoist = willHoist)
+                    print("Created Team purple.")
+                
+                # This block creates the emojis the bot accepts for points and buzzes. Credit for these wonderful emojis goes to Theresa Nyowheoma, President of Quiz Bowl at NYU, 2020-2021.
+                with open("templates/emoji/buzz.png", "rb") as buzzIMG:
+                    img = buzzIMG.read()
+                    await text.guild.create_custom_emoji(name = 'buzz', image = img)
+                with open("templates/emoji/neg.png", "rb") as negIMG:
+                    img = negIMG.read()
+                    await text.guild.create_custom_emoji(name = 'neg', image = img)
+                with open("templates/emoji/ten.png", "rb") as tenIMG:
+                    img = tenIMG.read()
+                    await text.guild.create_custom_emoji(name = 'ten', image = img)
+                with open("templates/emoji/power.png", "rb") as powerIMG:
+                    img = powerIMG.read()
+                    await text.guild.create_custom_emoji(name = 'power', image = img)
+                
+                report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
+            else:
+                report = "This command is only usable by server admins!"
+            await text.channel.send(report)
+        
         if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
             botSpoke = True
@@ -317,29 +362,6 @@ async def on_message(text):
             if exist:
                 report = "You already have an active game in this channel."
             else:
-                # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
-                if not get(text.guild.roles, name = 'reader'):
-                    await text.guild.create_role(name = 'reader', colour = discord.Colour(0x01ffdd), hoist = True)
-                    print("Created reader.")
-                if not get(text.guild.roles, name = 'Team red'):
-                    await text.guild.create_role(name = 'Team red', colour = discord.Colour(0xf70a0a), hoist = True)
-                    print("Created Team red.")
-                if not get(text.guild.roles, name = 'Team blue'):
-                    await text.guild.create_role(name = 'Team blue', colour = discord.Colour(0x009ef7), hoist = True)
-                    print("Created Team blue.")
-                if not get(text.guild.roles, name = 'Team green'):
-                    await text.guild.create_role(name = 'Team green', colour = discord.Colour(0x7bf70b), hoist = True)
-                    print("Created Team green.")
-                if not get(text.guild.roles, name = 'Team orange'):
-                    await text.guild.create_role(name = 'Team orange', colour = discord.Colour(0xff6000), hoist = True)
-                    print("Created Team orange.")
-                if not get(text.guild.roles, name = 'Team yellow'):
-                    await text.guild.create_role(name = 'Team yellow', colour = discord.Colour(0xfeed0e), hoist = True)
-                    print("Created Team yellow.")
-                if not get(text.guild.roles, name = 'Team purple'):
-                    await text.guild.create_role(name = 'Team purple', colour = discord.Colour(0xb40eed), hoist = True)
-                    print("Created Team purple.")
-                
                 report = ("Starting a new game. Reader is " + text.author.mention + ".")
                 x = Instance(current)
                 x.reader = text.author
@@ -518,7 +540,7 @@ async def on_message(text):
         if text.content.startswith('!team '):
             """ Adds the user to a given team.
             Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple.
-            If you do not have those roles in your server, the bot will create them for you. 
+            If you do not have those roles in your server, the bot will create them for you when you run !setup. 
             Depending on your role hierarchy, the bot-created roles might not show their color for each user.
             Make sure that, for non-admin users, the team roles are the highest they can have in the hierarchy.
             Admin roles should still be higher than the team roles.
@@ -693,9 +715,9 @@ async def on_message(text):
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
             emb = discord.Embed(title="Lev's Quizbowl Bot Commands", description="", color=0x57068C)
+            emb.add_field(name= "!setup", value= "Run this once, after the bot first joins the server.", inline=True)
             emb.add_field(name= "!start", value= "Starts a new game.", inline=True)
             emb.add_field(name= "buzz", value= "Buzzes in.", inline=True)
-            emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!clear", value= "Clears buzzes without advancing the TU count.", inline=True)
             emb.add_field(name= "!dead", value= "Clears buzzes after a dead TU and advances the TU count.", inline=True)
             emb.add_field(name= "!score", value= "Displays the score, sorted from highest to lowest.", inline=True)
@@ -709,8 +731,9 @@ async def on_message(text):
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!team [r/b/g/o/y/p]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
             emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
+            emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
-            emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
+            #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
             await text.channel.send(embed=emb)
             report = "Embedded tutorial."
             

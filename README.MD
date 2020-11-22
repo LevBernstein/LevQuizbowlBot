@@ -27,15 +27,17 @@ yourself is a good idea.
 
 ### Setup
 
-The bot requires the existence of a reader role and team roles; it will create those for you the first time you run !start, but you can also make them yourself if you so wish.
+After adding the bot to your server, run the command !setup (only admins can use this command). This will create the required roles and emojis.
+
+The bot requires the existence of a reader role and team roles; it will create those for you when you run !setup, but you can also make them yourself if you so wish.
 Newly created roles are, by default, lowest in the role hierarchy; if you want team roles to make everyone look like their team's color, make sure the team roles the bot uses
 are higher in the role hierarchy than whatever other non-admin roles are giving people their color.
 
 In addition to giving points by entering numbers, the bot allows you to give points through Discord emojis.
 These emojis must have the names :neg:, :power:, and :ten:. You can also buzz with :buzz:.
-These are not standard Discord emotes, so if you want to have them as an option for points or buzzing, you must make them in your server.
+The bot will create these emojis for you when you run !setup.
 Provided in "templates/emoji" are images used for those emotes in the NYU QB server, as created by Theresa Nyowheoma.
-Feel free to use those or make your own images for the emotes.
+The bot will use those images for the emojis, but you can also replace them with images of your own, if you so desire.
 
 ### Running the bot
 
@@ -50,7 +52,7 @@ You can comment out the print statements if they annoy you.
 
 * Score exporting through .csv files.
 
-* <strike>Autocreate required roles</strike> Implemented in version 1.5.3.
+* <strike>Autocreate required roles and emojis</strike> Implemented in version 1.5.4.
 
 * <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
 
