@@ -1,11 +1,11 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.2
+# Version: 1.5.3
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
 # you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
-# make a pull request on the bot's Github page (https://github.com/LevBernstein/LevQuizbowlBot).
+# make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot).
 
 
 from time import sleep
@@ -24,14 +24,14 @@ token = f.readline()
 g = open("templates/pfp.png", "rb")
 pic = g.read()
 generateLogs = True # if the log files are getting to be too much for you, set this to False
-
 client = discord.Client()
 
+# Global helper methods
 def isInt(st):
     """Checks if an entered string would be a valid number of points to assign."""
     if len(st) == 0: # this conditional handles an issue with the bot trying to interpret attached images as strings
         return False
-    if st.startswith('<:neg:') or st.startswith('<:ten:') or st.startswith('<:power:'):
+    if st.startswith('<:ten:') or st.startswith('<:neg:') or st.startswith('<:power:'): # this conditional handles awarding points with emojis
         return True
     if st[0] == '-' or st[0] == '+':
         return st[1:].isdigit()
@@ -39,7 +39,15 @@ def isInt(st):
 
 def isBuzz(st):
     """Checks if an entered string is a valid buzz."""
-    if st.startswith('buzz') or st.startswith('bz') or st.startswith('buz') or st.startswith('!buzz') or st.startswith('!bz') or st.startswith('!buz') or st.startswith(':bee:') or st.startswith('<:buzz:'):
+    validBuzzes = (
+        st.startswith('buz'),
+        st.startswith('<:buzz:'),
+        st.startswith('bz'),
+        st.startswith('!bz'),
+        st.startswith('!buz'),
+        st.startswith('<:bee:'),
+        )
+    if any(validBuzzes):
         return True
     return False
 
@@ -62,7 +70,7 @@ def isBuzz(st):
 #   red/blue/.../purpleTeam: Arrays of Discord Members from each team.
 #   red/blue/.../purpleNeg: Booleans tracking if a team is locked out from buzzing due to a member of their team negging.
 #   red/blue/.../purpleBonus: The number of points each team has earned on bonuses so far.
-#   logFile: A log created to track all commands from this particular game. Ignored by .gitignore.
+#   logFile: A log created to track all commands from this particular game. Untracked by .gitignore.
 class Instance: # instance of an active game. Every channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
@@ -115,8 +123,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise."""
         if mem in self.buzzed:
             return True
-        else:
-            return False
+        return False
     
     def clear(self):
         """Clears the buzzes and buzzed arrays, allowing all players to buzz in once more."""
@@ -147,8 +154,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         )
         if any(conditions):
             return False
-        else:
-            return True
+        return True
     
     def inTeam(self, mem):
         """When bonus mode is enabled, this method reports the team of the buzzer."""
@@ -265,7 +271,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
             self.lastBonusMem = None
             self.bonusMode = False
         else:
-            return
+            print("Could not stop a bonus!")
     
 games = [] # Array holding all active games
 
@@ -273,20 +279,22 @@ games = [] # Array holding all active games
 @client.event
 async def on_ready():
     """Ready message for when the bot is online."""
-    await client.change_presence(activity=discord.Game(name='Ready to play!'))
+    await client.change_presence(activity=discord.Game(name='Ready to play QB!'))
+    print("Activity live!")
     await client.user.edit(avatar=pic)
+    print("Avatar live!")
     print("Quizbowl Bot online!")
 
 @client.event
 async def on_message(text):
     """Handles all commands the bot considers valid. Scans all messages, so long as they are not from bots, to see if those messages start with a valid command."""
-    report = ""
+    report = "" # report is usually what the bot sends in response to valid commands, and, in case a game is active, it is what the bot write to that game's log file.
     text.content=text.content.lower() # for ease of use, all commands are lowercase, and all messages scanned are converted to lowercase.
     current = text.channel.id
     exist = False
     heldGame = None
     botSpoke = False
-    print(str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content)
+    print(str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content) # for an even more detailed log than the log files, check your console. This prints every message.
     if text.author.bot == False:
         for i in range(len(games)):
             if current == games[i].getChannel():
@@ -297,18 +305,41 @@ async def on_message(text):
         if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
             botSpoke = True
-            if text.author.guild_permissions.administrator:
+            if text.author.guild_permissions.administrator: # this makes sure people can't just ping everyone in the server whenever they want. Only admins can do that.
                 report = "@everyone Time for practice!"
             else:
                 report = "This command is only usable by server admins!"
             await text.channel.send(report)
     
-        if text.content.startswith('!start') or text.content.startswith('!begin'):
+        if text.content.startswith('!start') or text.content.startswith('!begin') or text.content.startswith('!read'):
             botSpoke = True
             print("calling start")
             if exist:
                 report = "You already have an active game in this channel."
             else:
+                # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
+                if not get(text.guild.roles, name = 'reader'):
+                    await text.guild.create_role(name = 'reader', colour = discord.Colour(0x01ffdd), hoist = True)
+                    print("Created reader.")
+                if not get(text.guild.roles, name = 'Team red'):
+                    await text.guild.create_role(name = 'Team red', colour = discord.Colour(0xf70a0a), hoist = True)
+                    print("Created Team red.")
+                if not get(text.guild.roles, name = 'Team blue'):
+                    await text.guild.create_role(name = 'Team blue', colour = discord.Colour(0x009ef7), hoist = True)
+                    print("Created Team blue.")
+                if not get(text.guild.roles, name = 'Team green'):
+                    await text.guild.create_role(name = 'Team green', colour = discord.Colour(0x7bf70b), hoist = True)
+                    print("Created Team green.")
+                if not get(text.guild.roles, name = 'Team orange'):
+                    await text.guild.create_role(name = 'Team orange', colour = discord.Colour(0xff6000), hoist = True)
+                    print("Created Team orange.")
+                if not get(text.guild.roles, name = 'Team yellow'):
+                    await text.guild.create_role(name = 'Team yellow', colour = discord.Colour(0xfeed0e), hoist = True)
+                    print("Created Team yellow.")
+                if not get(text.guild.roles, name = 'Team purple'):
+                    await text.guild.create_role(name = 'Team purple', colour = discord.Colour(0xb40eed), hoist = True)
+                    print("Created Team purple.")
+                
                 report = ("Starting a new game. Reader is " + text.author.mention + ".")
                 x = Instance(current)
                 x.reader = text.author
@@ -321,11 +352,14 @@ async def on_message(text):
             await text.channel.send(report)
         
         if text.content.startswith('!newreader'):
+            """Use this to set yourself as the new reader in an already-active game.
+            TODO Write a targeted form of this command, allowing you to set someone else as the new reader. Requires get_member(), and therefore __init__ with intents.members(), chunk_guilds_at_startup, fetch_all_members
+            """
             print("calling newreader")
             botSpoke = True
             if exist:
                 if text.author == heldGame.reader:
-                    report + "You are already the reader, " + text.author.mention + "!"
+                    report = "You are already the reader, " + text.author.mention + "!"
                 else:
                     report = "Removed reader role from " + heldGame.reader.mention + ". Gave reader role to " + text.author.mention + "."
                     role = get(text.guild.roles, name = 'reader')
@@ -356,6 +390,7 @@ async def on_message(text):
             await text.channel.send(report)
                 
         if text.content.startswith('!dead'):
+            """!dead and !clear are functionally identical, except !dead advanced the TU count while !clear does not."""
             print("calling dead")
             botSpoke = True
             if exist:
@@ -385,7 +420,7 @@ async def on_message(text):
         if len(games) != 0 and isInt(text.content): # Assigns points. Checks len games to avoid unnecessary calls.
             print("calling points")
             print(text.content + " is an int")
-            if text.content.startswith('<:neg:'): # This and the next two conditional check to see if someone is using a valid emoji to assign points. While, to the user, an emoji looks like :emojiName:, to the bot it is also wrapped in <>.
+            if text.content.startswith('<:neg:'): # This and the next two conditionals check to see if someone is using a valid emoji to assign points. While, to the user, an emoji looks like :emojiName:, to the bot it is also wrapped in <>.
                 text.content = "-5"
             if text.content.startswith('<:ten:'):
                 text.content = "10"
@@ -393,7 +428,6 @@ async def on_message(text):
                 text.content = "15"
             if exist:
                 botSpoke = True
-                #reader = get(text.guild.roles, name = 'reader')
                 if text.author.id == heldGame.reader.id:
                     if heldGame.bonusEnabled == False:
                         if heldGame.gain(int(text.content)):
@@ -405,7 +439,7 @@ async def on_message(text):
                                     break
                                 else:
                                     heldGame.buzzes.popleft()
-                    else: #bonuses enabled
+                    else: # bonuses enabled
                         if heldGame.bonusMode == False:
                             if heldGame.gain(int(text.content)):
                                 report = "Awarded TU points. "
@@ -420,7 +454,7 @@ async def on_message(text):
                                         break
                                     else:
                                         heldGame.buzzes.popleft()
-                        else: #bonusMode true
+                        else: # bonusMode true
                             heldGame.bonusGain(int(text.content))
                             report = "Awarded bonus points. Next TU."
                 await text.channel.send(report)
@@ -451,7 +485,8 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'): # Toggles whether bonus mode is enabled. It is enabled by default.
+        if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'):
+            """Toggles whether bonus mode is enabled. It is enabled by default."""
             print("calling bonusmode")
             botSpoke = True
             if exist:
@@ -466,7 +501,8 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if text.content.startswith('!bstop'): # Ends current bonus round. Use this to kill a bonus without giving points.
+        if text.content.startswith('!bstop'):
+            """Ends current bonus round. Use this to kill a bonus without giving points. Only use if something has gone wrong and you need to kill a bonus immediately."""
             print("calling bstop")
             botSpoke = True
             if exist:
@@ -479,34 +515,56 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
         
-        if text.content.startswith('!team '): # Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple
+        if text.content.startswith('!team '):
+            """ Adds the user to a given team.
+            Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple.
+            If you do not have those roles in your server, the bot will create them for you. 
+            Depending on your role hierarchy, the bot-created roles might not show their color for each user.
+            Make sure that, for non-admin users, the team roles are the highest they can have in the hierarchy.
+            Admin roles should still be higher than the team roles.
+            """
             print("calling team")
             botSpoke = True
             report = "Invalid role!"
+            rolesExist = False
             if text.content.startswith('!team r'):
                 role = get(text.guild.roles, name = 'Team red')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
             if text.content.startswith('!team b'):
                 role = get(text.guild.roles, name = 'Team blue')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
             if text.content.startswith('!team g'):
                 role = get(text.guild.roles, name = 'Team green')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
             if text.content.startswith('!team o'):
                 role = get(text.guild.roles, name = 'Team orange')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
             if text.content.startswith('!team y'):
                 role = get(text.guild.roles, name = 'Team yellow')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
             if text.content.startswith('!team p'):
                 role = get(text.guild.roles, name = 'Team purple')
-                await text.author.add_roles(role)
-                report = "Gave you the role, " + text.author.mention + "."
+                if role:
+                    await text.author.add_roles(role)
+                    report = "Gave you the role, " + text.author.mention + "."
+                    rolesExist = True
+            if not rolesExist:
+                report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."
             await text.channel.send(report)
         
         if text.content.startswith('!score'):
@@ -592,23 +650,23 @@ async def on_message(text):
                 
                 if heldGame.bonusMode == False:
                     if heldGame.hasBuzzed(text.author):
-                        print(str(text.author.mention) + ", you have already buzzed.")
+                        print("You have already buzzed, " + text.author.mention + ".")
                     else:
                         if heldGame.canBuzz(text.author):
                             if len(heldGame.buzzes) < 1:
                                 heldGame.buzz(text.author)
                                 print("Buzzed!")
-                                report = str(text.author.mention) + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
+                                report = text.author.mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
                                 await text.channel.send(report)
                             else:
                                 heldGame.buzz(text.author)
                                 print("Buzzed!")
                                 # because I don't want the bot to say anything if you buzz when someone has been recognized, each conditional needs its own await send.
                         else: # Might want to remove this if it causes too much clutter.
-                            report = "Your team is locked out of buzzing, " + str(text.author.mention) + "."
+                            report = "Your team is locked out of buzzing, " + text.author.mention + "."
                             await text.channel.send(report)
                 else:
-                    report = "We are currently playing a bonus. You cannot buzz."
+                    report = "We are currently playing a bonus. You cannot buzz, " + text.author.mention + "."
                     await text.channel.send(report)
             else:
                 report = "You need to start a game first! Use '!start' to start a game."
@@ -677,7 +735,7 @@ async def on_message(text):
                 await text.channel.send(report)
         
         if exist and generateLogs:
-            """Saves logs of valid commands in the log file"""
+            """Saves output of valid commands in the log file"""
             newline = (str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content + "\r\n")
             heldGame.logFile.write(newline)
             if botSpoke:

@@ -27,23 +27,9 @@ yourself is a good idea.
 
 ### Setup
 
-You will have to make a role named "reader" that is lower in the role hierarchy than the bot's highest role.
-
-You will also need to make the following roles:
-
-* Team red
-
-* Team blue
-
-* Team green
-
-* Team orange
-
-* Team yellow
-
-* Team purple
-
-All of them must be lower in the role hierarchy than the bot's highest role.
+The bot requires the existence of a reader role and team roles; it will create those for you the first time you run !start, but you can also make them yourself if you so wish.
+Newly created roles are, by default, lowest in the role hierarchy; if you want team roles to make everyone look like their team's color, make sure the team roles the bot uses
+are higher in the role hierarchy than whatever other non-admin roles are giving people their color.
 
 In addition to giving points by entering numbers, the bot allows you to give points through Discord emojis.
 These emojis must have the names :neg:, :power:, and :ten:. You can also buzz with :buzz:.
@@ -60,9 +46,11 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance
+* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance.
 
 * Score exporting through .csv files.
+
+* <strike>Autocreate required roles</strike> Implemented in version 1.5.3.
 
 * <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
 
