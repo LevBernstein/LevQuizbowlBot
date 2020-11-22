@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.5
+# Version: 1.5.6
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -21,8 +21,6 @@ from discord.utils import get
 # Setup
 f = open("token.txt", "r") # in token.txt, paste in your own Discord API token
 token = f.readline()
-g = open("templates/pfp.png", "rb")
-pic = g.read()
 generateLogs = True # if the log files are getting to be too much for you, set this to False
 client = discord.Client()
 
@@ -281,8 +279,6 @@ async def on_ready():
     """Ready message for when the bot is online."""
     await client.change_presence(activity=discord.Game(name='Ready to play QB!'))
     print("Activity live!")
-    await client.user.edit(avatar=pic)
-    print("Avatar live!")
     print("Quizbowl Bot online!")
 
 @client.event
@@ -294,7 +290,7 @@ async def on_message(text):
     exist = False
     heldGame = None
     botSpoke = False
-    print(str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content) # for an even more detailed log than the log files, check your console. This prints every message.
+    print(str(current) + " " + str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content) # for an even more detailed log than the log files, check your console. This prints every message.
     if text.author.bot == False:
         for i in range(len(games)):
             if current == games[i].getChannel():
@@ -303,6 +299,9 @@ async def on_message(text):
                 break
         
         if text.content.startswith('!setup'):
+            """Run this command once, after you add the bot the your server. It will handle all role and emoji creation, and set the bot's avatar.
+            Please avoid running this command more than once, as doing so will create duplicate emojis. If for whatever reason you have to do so, that's fine, just be prepared to delete those emojis.'
+            """
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
@@ -328,6 +327,7 @@ async def on_message(text):
                 if not get(text.guild.roles, name = 'Team purple'):
                     await text.guild.create_role(name = 'Team purple', colour = discord.Colour(0xb40eed), hoist = willHoist)
                     print("Created Team purple.")
+                print("Roles live!")
                 
                 # This block creates the emojis the bot accepts for points and buzzes. Credit for these wonderful emojis goes to Theresa Nyowheoma, President of Quiz Bowl at NYU, 2020-2021.
                 with open("templates/emoji/buzz.png", "rb") as buzzIMG:
@@ -342,7 +342,13 @@ async def on_message(text):
                 with open("templates/emoji/power.png", "rb") as powerIMG:
                     img = powerIMG.read()
                     await text.guild.create_custom_emoji(name = 'power', image = img)
+                print("Emojis live!")
                 
+                g = open("templates/pfp.png", "rb")
+                pic = g.read()
+                await client.user.edit(avatar=pic)
+                print("Avatar live!")
+    
                 report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
             await text.channel.send(report)
         
