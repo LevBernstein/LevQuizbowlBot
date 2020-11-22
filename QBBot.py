@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.6
+# Version: 1.5.7
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -306,9 +306,9 @@ async def on_message(text):
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
                 willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar.
-                if not get(text.guild.roles, name = 'reader'):
-                    await text.guild.create_role(name = 'reader', colour = discord.Colour(0x01ffdd), hoist = willHoist)
-                    print("Created reader.")
+                if not get(text.guild.roles, name = 'Reader'):
+                    await text.guild.create_role(name = 'Reader', colour = discord.Colour(0x01ffdd), hoist = willHoist)
+                    print("Created Reader.")
                 if not get(text.guild.roles, name = 'Team red'):
                     await text.guild.create_role(name = 'Team red', colour = discord.Colour(0xf70a0a), hoist = willHoist)
                     print("Created Team red.")
@@ -366,15 +366,18 @@ async def on_message(text):
             if exist:
                 report = "You already have an active game in this channel."
             else:
-                report = ("Starting a new game. Reader is " + text.author.mention + ".")
-                x = Instance(current)
-                x.reader = text.author
-                print(x.getChannel())
-                role = get(text.guild.roles, name = 'reader') # The bot needs you to make a role called "reader" in order to function.
-                await text.author.add_roles(role)
-                heldGame = x
-                x.logFile.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n")
-                games.append(x)
+                role = get(text.guild.roles, name = 'Reader') # The bot needs you to make a role called "Reader" in order to function.
+                if role:
+                    report = "Starting a new game. Reader is " + text.author.mention + "."
+                    x = Instance(current)
+                    x.reader = text.author
+                    print(x.getChannel())
+                    await text.author.add_roles(role)
+                    heldGame = x
+                    x.logFile.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n")
+                    games.append(x)
+                else:
+                    report = "You need to run !setup before you can start a game."
             await text.channel.send(report)
         
         if text.content.startswith('!newreader'):
@@ -389,7 +392,7 @@ async def on_message(text):
                     report = "You are already the reader, " + text.author.mention + "!"
                 else:
                     report = "Removed reader role from " + heldGame.reader.mention + ". Gave reader role to " + text.author.mention + "."
-                    role = get(text.guild.roles, name = 'reader')
+                    role = get(text.guild.roles, name = 'Reader')
                     await heldGame.reader.remove_roles(role)
                     heldGame.reader = text.author
                     await text.author.add_roles(role)
@@ -406,7 +409,7 @@ async def on_message(text):
                     if text.author.id == games[i].reader.id:
                         games.pop(i)
                         report = "Ended the game active in this channel."
-                        role = get(text.guild.roles, name = 'reader')
+                        role = get(text.guild.roles, name = 'Reader')
                         await text.author.remove_roles(role)
                     else:
                         report = "You are not the reader!"
