@@ -20,7 +20,7 @@ yourself is a good idea.
 
 ### Dependencies
 
-* Python 3. To install, visit https://python.org/downloads/ and follow the instructions for your OS.
+* Python 3. To install, visit [the Python downloads page](https://python.org/downloads/) and follow the instructions for your OS.
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
 
@@ -47,9 +47,11 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance.
+* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance, a la linked lists.
 
 * Score exporting through .csv files.
+
+* Targeted new reader command.
 
 * <strike>Autocreate required roles and emojis</strike> Implemented in version 1.5.4.
 
