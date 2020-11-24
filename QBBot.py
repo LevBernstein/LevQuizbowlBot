@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.14
+# Version: 1.5.15
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -697,35 +697,37 @@ async def on_message(text):
             diction = {}
             if exist:
                 areTeams = False
-                if heldGame.TUnum == 0:
+                if len(heldGame.scores) == 0:
                     desc = "Score at start of game:"
                 else:
                     desc = "Score after TU# " + str(heldGame.TUnum) + ": "
-                
-                #The following seven conditionals modify the scoreboard to include team scores, if those teams exist.
-                if heldGame.teamExist(heldGame.redTeam):
-                    desc += "\r\nRed team: " + str(heldGame.teamScore(heldGame.redTeam, heldGame.redBonus))
-                    areTeams = True
-                if heldGame.teamExist(heldGame.blueTeam):
-                    desc += "\r\nBlue team: " + str(heldGame.teamScore(heldGame.blueTeam, heldGame.blueBonus))
-                    areTeams = True
-                if heldGame.teamExist(heldGame.greenTeam):
-                    desc += "\r\nGreen team: " + str(heldGame.teamScore(heldGame.greenTeam, heldGame.greenBonus))
-                    areTeams = True
-                if heldGame.teamExist(heldGame.orangeTeam):
-                    desc += "\r\nOrange team: " + str(heldGame.teamScore(heldGame.orangeTeam, heldGame.orangeBonus))
-                    areTeams = True
-                if heldGame.teamExist(heldGame.yellowTeam):
-                    desc += "\r\nYellow team: " + str(heldGame.teamScore(heldGame.yellowTeam, heldGame.yellowBonus))
-                    areTeams = True
-                if heldGame.teamExist(heldGame.purpleTeam):
-                    desc += "\r\nPurple team: " + str(heldGame.teamScore(heldGame.purpleTeam, heldGame.purpleBonus))
-                    areTeams = True
-                if areTeams:
-                    desc += "\r\n\r\nIndividuals:"
+                    #The following seven conditionals modify the scoreboard to include team scores, if those teams exist.
+                    if heldGame.teamExist(heldGame.redTeam):
+                        desc += "\r\nRed team: " + str(heldGame.teamScore(heldGame.redTeam, heldGame.redBonus))
+                        areTeams = True
+                    if heldGame.teamExist(heldGame.blueTeam):
+                        desc += "\r\nBlue team: " + str(heldGame.teamScore(heldGame.blueTeam, heldGame.blueBonus))
+                        areTeams = True
+                    if heldGame.teamExist(heldGame.greenTeam):
+                        desc += "\r\nGreen team: " + str(heldGame.teamScore(heldGame.greenTeam, heldGame.greenBonus))
+                        areTeams = True
+                    if heldGame.teamExist(heldGame.orangeTeam):
+                        desc += "\r\nOrange team: " + str(heldGame.teamScore(heldGame.orangeTeam, heldGame.orangeBonus))
+                        areTeams = True
+                    if heldGame.teamExist(heldGame.yellowTeam):
+                        desc += "\r\nYellow team: " + str(heldGame.teamScore(heldGame.yellowTeam, heldGame.yellowBonus))
+                        areTeams = True
+                    if heldGame.teamExist(heldGame.purpleTeam):
+                        desc += "\r\nPurple team: " + str(heldGame.teamScore(heldGame.purpleTeam, heldGame.purpleBonus))
+                        areTeams = True
+                    if areTeams:
+                        desc += "\r\n\r\nIndividuals:"
                     
                 emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                 for x,y in heldGame.scores.items():
+                    print(x.nick == 'none')
+                    print(x.nick == 'None')
+                    print(x.nick == None)
                     if x.nick == 'none' or x.nick == 'None' or x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
                         diction[x.name] = y
                     else:
