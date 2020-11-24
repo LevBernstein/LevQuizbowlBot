@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.12
+# Version: 1.5.13
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -66,6 +66,7 @@ def isBuzz(st):
 # Parameters: prev is the previous backup of the scores.
 class Backup:
     def __init__(self, prev):
+        # TODO store TUnum here as well, to better handle negs
         self.scores = {}
         self.redBonus = 0
         self.blueBonus = 0
@@ -494,13 +495,13 @@ async def on_message(text):
             await text.channel.send(report)
         
         if text.content.startswith('!dead'):
-            """!dead and !clear are functionally identical, except !dead advances the TU count while !clear does not."""
             print("calling dead")
             botSpoke = True
             report = "You need to start a game first! Use '!start' to start a game."
             if exist:
                 if text.author.id == heldGame.reader.id:
                     heldGame.clear()
+                    heldGame.active = False
                     heldGame.TUnum+=1
                     report = "TU goes dead. Next TU."
                 else:
@@ -679,7 +680,10 @@ async def on_message(text):
             diction = {}
             if exist:
                 areTeams = False
-                desc = "Score after TU# " + str(heldGame.TUnum) + ": "
+                if heldGame.TUnum == 0:
+                    desc = "Score at start of game:"
+                else:
+                    desc = "Score after TU# " + str(heldGame.TUnum) + ": "
                 
                 #The following seven conditionals modify the scoreboard to include team scores, if those teams exist.
                 if heldGame.teamExist(heldGame.redTeam):
