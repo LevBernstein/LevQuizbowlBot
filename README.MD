@@ -24,6 +24,8 @@ yourself is a good idea.
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
 
+* The Google Client Library (if you wish to use score exporting). To install, run "pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
+
 ### Setup
 
 After adding the bot to your server, run the command !setup (only admins can use this command). This will create the required roles and emojis.
