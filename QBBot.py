@@ -13,9 +13,10 @@ from datetime import datetime, date, timezone
 import random as random
 import operator
 from collections import deque, OrderedDict
+import copy
 #import pickle
 #import os.path
-import copy
+
 
 import discord
 from discord.ext import commands
@@ -75,6 +76,7 @@ class Backup:
         self.yellowBonus = 0
         self.purpleBonus = 0
         self.TUnum = 0
+        self.lastNeg = False
         self.prev = prev
 
 #############################################################
@@ -97,7 +99,9 @@ class Backup:
 #   red/blue/.../purpleNeg: Booleans tracking if a team is locked out from buzzing due to a member of their team negging.
 #   red/blue/.../purpleBonus: The number of points each team has earned on bonuses so far.
 #   logFile: A log created to track all commands from this particular game. Untracked by .gitignore.
-class Instance: # instance of an active game. Every channel a game is run in gets its own instance. You cannot have more than one game per channel.
+#   lastNeg: Boolean that tracks whether the last buzz was a 0 or -5. Used for accurate formatting of scores.
+#   oldScores: A Backup() of a given Instance's scores.
+class Instance: # instance of an active game. Each channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
         self.TUnum = 0
@@ -130,11 +134,12 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
         self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
+        self.lastNeg = False
         self.oldScores = Backup(None)
 
     def getChannel(self):
         """Return the channel of a given Instance. 
-        TODO For the sake of proper encapsulation, to make my CS101 professor proud, I should switch to method calls like this for every local variable.
+        TODO For the sake of proper encapsulation, to make my CS101 professor proud, I should switch to method calls like this for every local variable I access in on_message().
         """
         return self.channel
     
@@ -149,9 +154,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
             print("Appended")
     
     def hasBuzzed(self, mem):
-        """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise.
-        TODO merge into canBuzz()
-        """
+        """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise."""
         if mem in self.buzzed:
             return True
         return False
@@ -165,6 +168,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.active = False
     
     def dead(self):
+        temp = copy.copy(self.oldScores)
         self.oldScores.prev = temp
         self.oldScores.scores = copy.copy(self.scores)
         self.oldScores.redBonus = self.redBonus
@@ -174,7 +178,9 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.oldScores.yellowBonus = self.yellowBonus
         self.oldScores.purpleBonus = self.purpleBonus
         self.oldScores.TUnum = self.TUnum
+        self.oldScores.lastNeg = self.lastNeg
         self.clear()
+        self.lastNeg = False
         self.TUnum +=1
     
     def unlock(self):
@@ -188,7 +194,10 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.purpleNeg = False
     
     def canBuzz(self, mem):
-        """Checks if a player is allowed to buzz. This exists alongside hasBuzzed() to allow for team functionality."""
+        """Checks if a player's team is allowed to buzz.
+        This exists alongside hasBuzzed() to reflect the two different reasons for not being allowed to buzz:
+        Having personally negged, or a teammate having negged. canBuzz() checks if a teammate has negged.
+        """
         conditions = (
             (mem in self.redTeam and self.redNeg==True),
             (mem in self.blueTeam and self.blueNeg==True),
@@ -242,6 +251,12 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.purpleBonus = self.oldScores.purpleBonus
         self.oldScores = self.oldScores.prev
         self.TUnum = self.oldScores.TUnum
+        """
+        if self.lastNeg:
+            self.TUnum += 1
+            self.oldScores.TUnum += 1
+        """
+        self.lastNeg = self.oldScores.lastNeg
         self.clear()
         
     def gain(self, points):
@@ -263,7 +278,9 @@ class Instance: # instance of an active game. Every channel a game is run in get
             self.oldScores.yellowBonus = self.yellowBonus
             self.oldScores.purpleBonus = self.purpleBonus
             self.oldScores.TUnum = self.TUnum
+            self.oldScores.lastNeg = self.lastNeg
             if points > 0: # Someone got a TU correct.
+                self.lastNeg = False
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
                     self.active = False
@@ -279,6 +296,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
                     self.lastBonusMem = mem
                     self.bonusMode = True # Move on to awarding bonus points
             else: #Someone got a 0 or a -5.
+                self.lastNeg = True
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
                 else:
@@ -700,7 +718,7 @@ async def on_message(text):
                 if len(heldGame.scores) == 0:
                     desc = "Score at start of game:"
                 else:
-                    desc = "Score after TU# " + str(heldGame.TUnum) + ": "
+                    desc = "Score after " + str(heldGame.TUnum) + " completed TUs: "
                     #The following seven conditionals modify the scoreboard to include team scores, if those teams exist.
                     if heldGame.teamExist(heldGame.redTeam):
                         desc += "\r\nRed team: " + str(heldGame.teamScore(heldGame.redTeam, heldGame.redBonus))
