@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.10
+# Version: 1.5.11
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -58,6 +58,24 @@ def isBuzz(st):
         return True
     return False
 
+
+#############################################################
+# Backup(self, prev)
+# This class is a backup of previous scores, for the purpose of being able to undo an incorrect points assignment.
+# It is essentially a singly linked list with some additional data fields.
+# Parameters: prev is the previous backup of the scores.
+class Backup:
+    def __init__(self, prev):
+        self.scores = {}
+        self.redBonus = 0
+        self.blueBonus = 0
+        self.greenBonus = 0
+        self.orangeBonus = 0
+        self.yellowBonus = 0
+        self.purpleBonus = 0
+        self.prev = prev
+
+
 #############################################################
 # Instance(self, channel)
 # This class is an instance of an active game of Quizbowl.
@@ -111,8 +129,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
         self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
-        self.backupScores = {} # TODO implement storing all past scores through linked lists, not just the last one
-        self.backupTeamScores = {} # TODO ditto
+        self.oldScores = Backup(None)
 
     def getChannel(self):
         """Return the channel of a given Instance. 
@@ -202,30 +219,33 @@ class Instance: # instance of an active game. Every channel a game is run in get
     def undo(self):
         """Reverts scores back to one tossup ago."""
         self.TUnum -= 1
-        self.scores = copy.copy(self.backupScores)
-        self.redBonus = self.backupTeamScores[0]
-        self.blueBonus = self.backupTeamScores[1]
-        self.greenBonus = self.backupTeamScores[2]
-        self.orangeBonus = self.backupTeamScores[3]
-        self.yellowBonus = self.backupTeamScores[4]
-        self.purpleBonus = self.backupTeamScores[5]
-    
+        self.scores = copy.copy(self.oldScores.scores)
+        self.redBonus = self.oldScores.redBonus
+        self.blueBonus = self.oldScores.blueBonus
+        self.greenBonus = self.oldScores.greenBonus
+        self.orangeBonus = self.oldScores.orangeBonus
+        self.yellowBonus = self.oldScores.yellowBonus
+        self.purpleBonus = self.oldScores.purpleBonus
+        self.oldScores = self.oldScores.prev
+        
     def gain(self, points):
         """Awards points to the player at the front of the buzzes queue. 
         If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
         If the points awarded is a negative number or 0, they have gotten a TU incorrect, so it adds that to the individual's score and does not advance TUnum. Returns false.
-        Rarely, pickling error arises; might have fixed by switching to copy from deepcopy.
+        Rarely, pickling error arises with the backup system; might have fixed by switching to copy from deepcopy.
         """
         awarded = False
         if self.active == True:
             mem = self.buzzes.popleft()
-            self.backupScores = copy.copy(self.scores)
-            self.backupTeamScores[0] = self.redBonus
-            self.backupTeamScores[1] = self.blueBonus
-            self.backupTeamScores[2] = self.greenBonus
-            self.backupTeamScores[3] = self.orangeBonus
-            self.backupTeamScores[4] = self.yellowBonus
-            self.backupTeamScores[5] = self.purpleBonus
+            temp = self.oldScores
+            self.oldScores.prev = temp
+            self.oldScores.scores = copy.copy(self.scores)
+            self.oldScores.redBonus = self.redBonus
+            self.oldScores.blueBonus = self.blueBonus
+            self.oldScores.greenBonus = self.greenBonus
+            self.oldScores.orangeBonus = self.orangeBonus
+            self.oldScores.yellowBonus = self.yellowBonus
+            self.oldScores.purpleBonus = self.purpleBonus
             if points > 0: # Someone got a TU correct.
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
@@ -264,6 +284,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
+            
         return awarded
 
     def bonusGain(self, points):
@@ -456,11 +477,17 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game."
             if exist:
                 if text.author.id == heldGame.reader.id:
-                    if heldGame.TUnum == 0:
-                        report = "Nothing to undo."
+                    if heldGame.bonusMode:
+                        report = "Finish your bonus first!"
                     else:
-                        heldGame.undo()
-                        report = "Undid last Tossup scorechange"
+                        if heldGame.active:
+                            report = "Assign TU points first."
+                        else:
+                            if heldGame.TUnum == 0:
+                                report = "Nothing to undo."
+                            else:
+                                heldGame.undo()
+                                report = "Undid last Tossup scorechange"
                 else:
                     report = "You are not the reader!"
             await text.channel.send(report)
