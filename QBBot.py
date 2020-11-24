@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.9
+# Version: 1.5.10
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -455,11 +455,14 @@ async def on_message(text):
         if text.content.startswith('!undo'):
             report = "You need to start a game first! Use '!start' to start a game."
             if exist:
-                if heldGame.TUnum == 0:
-                    report = "Nothing to undo."
+                if text.author.id == heldGame.reader.id:
+                    if heldGame.TUnum == 0:
+                        report = "Nothing to undo."
+                    else:
+                        heldGame.undo()
+                        report = "Undid last Tossup scorechange"
                 else:
-                    heldGame.undo()
-                    report = "Undid last Tossup scorechange"
+                    report = "You are not the reader!"
             await text.channel.send(report)
         
         if text.content.startswith('!dead'):
