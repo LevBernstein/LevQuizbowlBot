@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.13
+# Version: 1.5.14
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -74,8 +74,8 @@ class Backup:
         self.orangeBonus = 0
         self.yellowBonus = 0
         self.purpleBonus = 0
+        self.TUnum = 0
         self.prev = prev
-
 
 #############################################################
 # Instance(self, channel)
@@ -162,7 +162,21 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.buzzes = deque()
         self.buzzed = deque()
         self.unlock()
-        
+        self.active = False
+    
+    def dead(self):
+        self.oldScores.prev = temp
+        self.oldScores.scores = copy.copy(self.scores)
+        self.oldScores.redBonus = self.redBonus
+        self.oldScores.blueBonus = self.blueBonus
+        self.oldScores.greenBonus = self.greenBonus
+        self.oldScores.orangeBonus = self.orangeBonus
+        self.oldScores.yellowBonus = self.yellowBonus
+        self.oldScores.purpleBonus = self.purpleBonus
+        self.oldScores.TUnum = self.TUnum
+        self.clear()
+        self.TUnum +=1
+    
     def unlock(self):
         """Allows all teams to buzz in again."""
         print("Unlocking...")
@@ -219,7 +233,6 @@ class Instance: # instance of an active game. Every channel a game is run in get
     
     def undo(self):
         """Reverts scores back to one tossup ago."""
-        self.TUnum -= 1
         self.scores = copy.copy(self.oldScores.scores)
         self.redBonus = self.oldScores.redBonus
         self.blueBonus = self.oldScores.blueBonus
@@ -228,6 +241,8 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.yellowBonus = self.oldScores.yellowBonus
         self.purpleBonus = self.oldScores.purpleBonus
         self.oldScores = self.oldScores.prev
+        self.TUnum = self.oldScores.TUnum
+        self.clear()
         
     def gain(self, points):
         """Awards points to the player at the front of the buzzes queue. 
@@ -247,6 +262,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
             self.oldScores.orangeBonus = self.orangeBonus
             self.oldScores.yellowBonus = self.yellowBonus
             self.oldScores.purpleBonus = self.purpleBonus
+            self.oldScores.TUnum = self.TUnum
             if points > 0: # Someone got a TU correct.
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
@@ -266,7 +282,9 @@ class Instance: # instance of an active game. Every channel a game is run in get
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
                 else:
-                    self.scores[mem] = points  
+                    self.scores[mem] = points
+                if len(self.buzzes) == 0:
+                    self.active = False
                 if mem in self.redTeam:
                     self.redNeg = True
                     print("red locked out")
@@ -293,6 +311,7 @@ class Instance: # instance of an active game. Every channel a game is run in get
             return
         if not self.bonusMode:
             return
+        temp = copy.copy(self.oldScores)
         conditions = (
             self.lastBonusMem in self.redTeam,
             self.lastBonusMem in self.blueTeam,
@@ -485,7 +504,7 @@ async def on_message(text):
                         if heldGame.active:
                             report = "Assign TU points first!"
                         else:
-                            if heldGame.TUnum == 0:
+                            if heldGame.TUnum == 0 and len(heldGame.scores) == 0:
                                 report = "Nothing to undo."
                             else:
                                 heldGame.undo()
@@ -500,9 +519,7 @@ async def on_message(text):
             report = "You need to start a game first! Use '!start' to start a game."
             if exist:
                 if text.author.id == heldGame.reader.id:
-                    heldGame.clear()
-                    heldGame.active = False
-                    heldGame.TUnum+=1
+                    heldGame.dead()
                     report = "TU goes dead. Next TU."
                 else:
                     report = "You are not the reader!"
@@ -819,6 +836,7 @@ async def on_message(text):
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!team [r/b/g/o/y/p]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
             emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
+            emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True)
             emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
