@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.11
+# Version: 1.5.12
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -14,16 +14,16 @@ import random as random
 import operator
 from collections import deque, OrderedDict
 #import pickle
-import os.path
+#import os.path
 import copy
 
 import discord
 from discord.ext import commands
 from discord.utils import get
 
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+#from googleapiclient.discovery import build
+#from google_auth_oauthlib.flow import InstalledAppFlow
+#from google.auth.transport.requests import Request
 
 
 
@@ -232,12 +232,12 @@ class Instance: # instance of an active game. Every channel a game is run in get
         """Awards points to the player at the front of the buzzes queue. 
         If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
         If the points awarded is a negative number or 0, they have gotten a TU incorrect, so it adds that to the individual's score and does not advance TUnum. Returns false.
-        Rarely, pickling error arises with the backup system; might have fixed by switching to copy from deepcopy.
+        Rarely, a pickling error arises with the backup system; might have fixed by switching to copy from deepcopy.
         """
         awarded = False
         if self.active == True:
             mem = self.buzzes.popleft()
-            temp = self.oldScores
+            temp = copy.copy(self.oldScores)
             self.oldScores.prev = temp
             self.oldScores.scores = copy.copy(self.scores)
             self.oldScores.redBonus = self.redBonus
@@ -284,7 +284,6 @@ class Instance: # instance of an active game. Every channel a game is run in get
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
-            
         return awarded
 
     def bonusGain(self, points):
@@ -474,6 +473,8 @@ async def on_message(text):
             await text.channel.send(report)
         
         if text.content.startswith('!undo'):
+            print("calling undo")
+            botSpoke = True
             report = "You need to start a game first! Use '!start' to start a game."
             if exist:
                 if text.author.id == heldGame.reader.id:
@@ -481,19 +482,19 @@ async def on_message(text):
                         report = "Finish your bonus first!"
                     else:
                         if heldGame.active:
-                            report = "Assign TU points first."
+                            report = "Assign TU points first!"
                         else:
                             if heldGame.TUnum == 0:
                                 report = "Nothing to undo."
                             else:
                                 heldGame.undo()
-                                report = "Undid last Tossup scorechange"
+                                report = "Undid last Tossup scorechange."
                 else:
                     report = "You are not the reader!"
             await text.channel.send(report)
         
         if text.content.startswith('!dead'):
-            """!dead and !clear are functionally identical, except !dead advanced the TU count while !clear does not."""
+            """!dead and !clear are functionally identical, except !dead advances the TU count while !clear does not."""
             print("calling dead")
             botSpoke = True
             report = "You need to start a game first! Use '!start' to start a game."
