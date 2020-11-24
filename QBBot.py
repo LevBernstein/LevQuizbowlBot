@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.7
+# Version: 1.5.8
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -118,7 +118,9 @@ class Instance: # instance of an active game. Every channel a game is run in get
             print("Appended")
     
     def hasBuzzed(self, mem):
-        """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise."""
+        """Returns whether a player has already buzzed. Returns True if they have already buzzed, and cannot do so again; False otherwise.
+        TODO merge into canBuzz()
+        """
         if mem in self.buzzed:
             return True
         return False
@@ -304,6 +306,7 @@ async def on_message(text):
             """
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
+                await text.channel.send("Starting setup...")
                 # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
                 willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar.
                 if not get(text.guild.roles, name = 'Reader'):
@@ -374,7 +377,7 @@ async def on_message(text):
                     print(x.getChannel())
                     await text.author.add_roles(role)
                     heldGame = x
-                    x.logFile.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n")
+                    x.logFile.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
                     games.append(x)
                 else:
                     report = "You need to run !setup before you can start a game."
@@ -457,10 +460,12 @@ async def on_message(text):
                     if heldGame.bonusEnabled == False:
                         if heldGame.gain(int(text.content)):
                             report = "Awarded points. Next TU."
+                            await text.channel.send(report)
                         else:
                             while len(heldGame.buzzes) > 0:
                                 if heldGame.canBuzz(heldGame.buzzes[0]):
                                     report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
+                                    await text.channel.send(report)
                                     break
                                 else:
                                     heldGame.buzzes.popleft()
@@ -472,17 +477,21 @@ async def on_message(text):
                                 if getTeam != "None":
                                     report += "Bonus is for " + getTeam + ". "
                                 report +=  "Awaiting bonus points."
+                                await text.channel.send(report)
                             else:
                                 while len(heldGame.buzzes) > 0:
                                     if heldGame.canBuzz(heldGame.buzzes[0]):
                                         report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
+                                        await text.channel.send(report)
                                         break
                                     else:
                                         heldGame.buzzes.popleft()
+                                        # because I don't send a report here, I can't have the text.channel.send(report) at the end; doing so throws an exception because it would be sending an empty message
                         else: # bonusMode true
                             heldGame.bonusGain(int(text.content))
                             report = "Awarded bonus points. Next TU."
-                await text.channel.send(report)
+                            await text.channel.send(report)
+                #await text.channel.send(report)
         
         if text.content.startswith('wd') or text.content.startswith('!wd') or text.content.startswith('withdraw') or text.content.startswith('!withdraw'):
             print("calling withdraw")
@@ -696,20 +705,21 @@ async def on_message(text):
     
         if text.content.startswith('!github'):
             print("calling github")
+            #gitImage = discord.File("templates/github.png", filename="templates/github.png")
             botSpoke = True
-            emb = discord.Embed(title="Lev's Quizbowl Bot", description="", color=0x57068C)
+            emb = discord.Embed(title = "Lev's Quizbowl Bot", description = "", color = 0x57068C)
             #await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot")
-            emb.add_field(name= "View this bot's source code at:", value= "https://github.com/LevBernstein/LevQuizbowlBot", inline=True)
-            await text.channel.send(embed=emb)
+            emb.add_field(name = "View this bot's source code at:", value = "https://github.com/LevBernstein/LevQuizbowlBot", inline = True)
+            await text.channel.send(embed = emb)
             report = "Embedded github."
             
         if text.content.startswith('!report'):
             print("calling report")
             botSpoke = True
-            emb = discord.Embed(title="Report bugs or suggest features", description="", color=0x57068C)
+            emb = discord.Embed(title = "Report bugs or suggest features", description = "", color = 0x57068C)
             #await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
-            emb.add_field(name= "Report any issues at:", value= "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline=True)
-            await text.channel.send(embed=emb)
+            emb.add_field(name = "Report any issues at:", value = "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline = True)
+            await text.channel.send(embed = emb)
             report = "Embedded report."
     
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
@@ -737,7 +747,7 @@ async def on_message(text):
             await text.channel.send(embed=emb)
             report = "Embedded tutorial."
             
-        elif text.content.startswith('!tu') or text.content.startswith('!tunum'): # elif because otherwise !tutorial calls this too
+        elif text.content.startswith('!tu'): # elif because otherwise !tutorial calls this too
             print("calling tu")
             if exist:
                 report = "Current TU: #" + str(heldGame.TUnum + 1) + "."
@@ -758,11 +768,13 @@ async def on_message(text):
                 await text.channel.send(report)
         
         if exist and generateLogs:
-            """Saves output of valid commands in the log file"""
-            newline = (str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content + "\r\n")
+            """Saves output of valid commands in the log file.
+            To disable logging, set generateLogs to False in the setup at the top of this file.
+            """
+            newline = ( f'{str(datetime.now())[:-5]: <23}' + " " + f'{(text.author.name + ":"): >33}' + " " +  text.content + "\r\n")
             heldGame.logFile.write(newline)
             if botSpoke:
-                newline = "~~~BOT: " + report + "\r\n"
+                newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
                 heldGame.logFile.write(newline)
         
 client.run(token)
