@@ -49,7 +49,7 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* An undo method to undo the entering of scores and decrement the TU# by 1. Potentially do this with a backup of each major variable, or a full backup instance stored in each instance, a la linked lists.
+* <strike>Undo command.</strike> Implemented in version 1.5.12.
 
 * Automatically export scoresheets to Google Sheets
 
@@ -57,11 +57,11 @@ You can comment out the print statements if they annoy you.
 
 * Targeted new reader command.
 
-* <strike>Autocreate required roles and emojis</strike> Implemented in version 1.5.4.
+* <strike>Autocreate required roles and emojis.</strike> Implemented in version 1.5.4.
 
-* <strike>Command that sets a new reader</strike> Implemented in version 1.4.6.
+* <strike>Command that sets a new reader.</strike> Implemented in version 1.4.6.
 
-* <strike>Record logs for each game</strike> Implemented in version 1.5.0.
+* <strike>Record logs for each game.</strike> Implemented in version 1.5.0.
 
 * <strike>Allow emoji for points/buzzing.</strike> Implemented in version 1.4.3.
 
