@@ -1,22 +1,31 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.8
+# Version: 1.5.9
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
 # you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
 # make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot).
 
-
+from __future__ import print_function
 from time import sleep
 from datetime import datetime, date, timezone
 import random as random
 import operator
 from collections import deque, OrderedDict
+#import pickle
+import os.path
+import copy
 
 import discord
 from discord.ext import commands
 from discord.utils import get
+
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+
+
 
 # Setup
 f = open("token.txt", "r") # in token.txt, paste in your own Discord API token
@@ -100,13 +109,17 @@ class Instance: # instance of an active game. Every channel a game is run in get
         self.yellowBonus = 0
         self.purpleBonus = 0
         self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
+        self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
+        # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
+        self.backupScores = {} # TODO implement storing all past scores through linked lists, not just the last one
+        self.backupTeamScores = {} # TODO ditto
 
     def getChannel(self):
         """Return the channel of a given Instance. 
         TODO For the sake of proper encapsulation, to make my CS101 professor proud, I should switch to method calls like this for every local variable.
         """
         return self.channel
-        
+    
     def buzz(self, mem):
         """Adds a buzzing player to the buzzes and buzzed arrays, if they are allowed to buzz."""
         if self.hasBuzzed(mem):
@@ -186,14 +199,33 @@ class Instance: # instance of an active game. Every channel a game is run in get
             return True
         return False
     
+    def undo(self):
+        """Reverts scores back to one tossup ago."""
+        self.TUnum -= 1
+        self.scores = copy.copy(self.backupScores)
+        self.redBonus = self.backupTeamScores[0]
+        self.blueBonus = self.backupTeamScores[1]
+        self.greenBonus = self.backupTeamScores[2]
+        self.orangeBonus = self.backupTeamScores[3]
+        self.yellowBonus = self.backupTeamScores[4]
+        self.purpleBonus = self.backupTeamScores[5]
+    
     def gain(self, points):
         """Awards points to the player at the front of the buzzes queue. 
         If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
         If the points awarded is a negative number or 0, they have gotten a TU incorrect, so it adds that to the individual's score and does not advance TUnum. Returns false.
+        Rarely, pickling error arises; might have fixed by switching to copy from deepcopy.
         """
         awarded = False
         if self.active == True:
             mem = self.buzzes.popleft()
+            self.backupScores = copy.copy(self.scores)
+            self.backupTeamScores[0] = self.redBonus
+            self.backupTeamScores[1] = self.blueBonus
+            self.backupTeamScores[2] = self.greenBonus
+            self.backupTeamScores[3] = self.orangeBonus
+            self.backupTeamScores[4] = self.yellowBonus
+            self.backupTeamScores[5] = self.purpleBonus
             if points > 0: # Someone got a TU correct.
                 if mem in self.scores:
                     self.scores[mem] = self.scores[mem] + points
@@ -402,6 +434,7 @@ async def on_message(text):
             await text.channel.send(report)
         
         if text.content.startswith('!end') or text.content.startswith('!stop'):
+            # TODO make end autoexport scoresheet
             print("calling end")
             botSpoke = True
             report = "You do not currently have an active game."
@@ -418,7 +451,17 @@ async def on_message(text):
                         report = "You are not the reader!"
                     break
             await text.channel.send(report)
-                
+        
+        if text.content.startswith('!undo'):
+            report = "You need to start a game first! Use '!start' to start a game."
+            if exist:
+                if heldGame.TUnum == 0:
+                    report = "Nothing to undo."
+                else:
+                    heldGame.undo()
+                    report = "Undid last Tossup scorechange"
+            await text.channel.send(report)
+        
         if text.content.startswith('!dead'):
             """!dead and !clear are functionally identical, except !dead advanced the TU count while !clear does not."""
             print("calling dead")
@@ -755,8 +798,10 @@ async def on_message(text):
                 report = "You need to start a game first! Use '!start' to start a game."
             await text.channel.send(report)
 
-        if text.content.startswith('!export'):
-            #TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir.
+        if text.content.startswith('!export'): # DEPRECATED will autoexport when !end is run
+            """ The score will be automatically exported to a CSV file on your local machine.
+            What the !export command will do, when implemented, is write that to a Google Sheet and send that to the server.
+            TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir."""
             if exist:
                 exportedTime = str(datetime.now())[:-5]
                 emb = discord.Embed(title="Exported scoresheet at " + exportedTime + ".", description="", color=0x57068C)
