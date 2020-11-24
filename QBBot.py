@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.15
+# Version: 1.5.16
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -99,7 +99,7 @@ class Backup:
 #   red/blue/.../purpleNeg: Booleans tracking if a team is locked out from buzzing due to a member of their team negging.
 #   red/blue/.../purpleBonus: The number of points each team has earned on bonuses so far.
 #   logFile: A log created to track all commands from this particular game. Untracked by .gitignore.
-#   lastNeg: Boolean that tracks whether the last buzz was a 0 or -5. Used for accurate formatting of scores.
+#   lastNeg: Boolean that tracks whether the last buzz was a 0/-5. Used in undo.
 #   oldScores: A Backup() of a given Instance's scores.
 class Instance: # instance of an active game. Each channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
@@ -131,8 +131,10 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.orangeBonus = 0
         self.yellowBonus = 0
         self.purpleBonus = 0
-        self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
-        self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
+        #self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
+        #self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
+        self.logFile = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log")
+        self.csvScore = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv")
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
         self.lastNeg = False
         self.oldScores = Backup(None)
@@ -287,6 +289,11 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
+                    with open(self.csvScore) as f:
+                        body = f.readlines()
+                    body[0] += mem.name + ","
+                    with open(self.csvScore, "w") as f:
+                        f.writelines(body)
                     self.scores[mem] = points
                     self.active = False
                     self.clear()
@@ -467,7 +474,10 @@ async def on_message(text):
                     print(x.getChannel())
                     await text.author.add_roles(role)
                     heldGame = x
-                    x.logFile.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
+                    with open(x.logFile, "a") as f:
+                        f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
+                    with open(x.csvScore, "a") as f:
+                        f.write(" ,")
                     games.append(x)
                 else:
                     report = "You need to run !setup before you can start a game."
@@ -890,9 +900,10 @@ async def on_message(text):
             To disable logging, set generateLogs to False in the setup at the top of this file.
             """
             newline = ( f'{str(datetime.now())[:-5]: <23}' + " " + f'{(text.author.name + ":"): >33}' + " " +  text.content + "\r\n")
-            heldGame.logFile.write(newline)
-            if botSpoke:
-                newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
-                heldGame.logFile.write(newline)
+            with open(heldGame.logFile, "a") as f:
+                f.write(newline)
+                if botSpoke:
+                    newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
+                    f.write(newline)
         
 client.run(token)
