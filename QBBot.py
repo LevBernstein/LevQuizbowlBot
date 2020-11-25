@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.0
+# Version: 1.6.1
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -529,8 +529,17 @@ async def on_message(text):
             for i in range(len(games)):
                 if current == games[i].getChannel():
                     exist = True
-                    heldGame = games[i]
                     if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
+                        with open(games[i].csvScore) as f:
+                            body = f.readlines()
+                            subMems = body[0]
+                        
+                        newLine = "\r\nTotal:,"
+                        with open(games[i].csvScore, "a") as f:
+                            for x,y in games[i].scores.items():
+                                newLine += str(y)
+                            f.write(newLine)
+                        
                         games.pop(i)
                         report = "Ended the game active in this channel."
                         role = get(text.guild.roles, name = 'Reader')
@@ -611,6 +620,7 @@ async def on_message(text):
                                     break
                                 else:
                                     heldGame.buzzes.popleft()
+                                    report = "Cannot buzz."
                     else: # bonuses enabled
                         if heldGame.bonusMode == False:
                             storedMem = heldGame.buzzes[0]
@@ -629,6 +639,7 @@ async def on_message(text):
                                         break
                                     else:
                                         heldGame.buzzes.popleft()
+                                        report = "Cannot buzz."
                                         # because I don't send a report here, I can't have the text.channel.send(report) at the end; doing so throws an exception because it would be sending an empty message
                         else: # bonusMode true
                             heldGame.bonusGain(int(text.content))
@@ -836,6 +847,7 @@ async def on_message(text):
                                 await text.channel.send(report)
                             else:
                                 heldGame.buzz(text.author)
+                                report = "Held a buzz."
                                 print("Buzzed!")
                                 # because I don't want the bot to say anything if you buzz when someone has been recognized, each conditional needs its own await send.
                         else: # Might want to remove this if it causes too much clutter.
