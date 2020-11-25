@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.5.16
+# Version: 1.6.0
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -298,7 +298,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.active = False
                     self.clear()
                     awarded = True
-                self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
+                
                 if self.bonusEnabled:
                     self.lastBonusMem = mem
                     self.bonusMode = True # Move on to awarding bonus points
@@ -328,6 +328,26 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
+            
+            with open(self.csvScore) as f:
+                body = f.readlines()
+                subMems = body[0].split(',')
+                found = False
+                for i in range(len(subMems)):
+                    if mem.name == subMems[i]:
+                        spot = i
+                        found = True
+                        break
+            if found:
+                newLine = "\r\n" + str(self.TUnum)
+                for i in range (spot):
+                    newLine += " ,"
+                newLine += str(points) + ","
+                with open(self.csvScore, "a") as f:
+                    f.write(newLine)
+        
+        if awarded:
+            self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
         return awarded
 
     def bonusGain(self, points):
@@ -477,7 +497,7 @@ async def on_message(text):
                     with open(x.logFile, "a") as f:
                         f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
                     with open(x.csvScore, "a") as f:
-                        f.write(" ,")
+                        f.write("TU#,")
                     games.append(x)
                 else:
                     report = "You need to run !setup before you can start a game."
@@ -510,7 +530,7 @@ async def on_message(text):
                 if current == games[i].getChannel():
                     exist = True
                     heldGame = games[i]
-                    if text.author.id == games[i].reader.id:
+                    if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
                         games.pop(i)
                         report = "Ended the game active in this channel."
                         role = get(text.guild.roles, name = 'Reader')
@@ -520,6 +540,7 @@ async def on_message(text):
                     break
             await text.channel.send(report)
         
+        # DEPRECATED until I figure out the issue with TUnum tracking.
         if text.content.startswith('!undo'):
             print("calling undo")
             botSpoke = True
@@ -540,6 +561,7 @@ async def on_message(text):
                 else:
                     report = "You are not the reader!"
             await text.channel.send(report)
+        
         
         if text.content.startswith('!dead'):
             print("calling dead")
@@ -591,9 +613,10 @@ async def on_message(text):
                                     heldGame.buzzes.popleft()
                     else: # bonuses enabled
                         if heldGame.bonusMode == False:
+                            storedMem = heldGame.buzzes[0]
                             if heldGame.gain(int(text.content)):
                                 report = "Awarded TU points. "
-                                getTeam = heldGame.inTeam(text.author)
+                                getTeam = heldGame.inTeam(storedMem)
                                 if getTeam != "None":
                                     report += "Bonus is for " + getTeam + ". "
                                 report +=  "Awaiting bonus points."
@@ -753,10 +776,7 @@ async def on_message(text):
                     
                 emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                 for x,y in heldGame.scores.items():
-                    print(x.nick == 'none')
-                    print(x.nick == 'None')
-                    print(x.nick == None)
-                    if x.nick == 'none' or x.nick == 'None' or x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
+                    if x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
                         diction[x.name] = y
                     else:
                         diction[x.nick] = y
@@ -866,7 +886,7 @@ async def on_message(text):
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!team [r/b/g/o/y/p]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
             emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
-            emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True)
+            emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
             emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
