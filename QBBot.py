@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.2
+# Version: 1.6.3
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -383,6 +383,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         else:
             self.scores[self.lastBonusMem] += points
         self.bonusMode = False
+        # TODO add points to csv. Don't forget to update TU points as well, just in case teams are disabled.
         
     def bonusStop(self):
         """Kills an active bonus."""
@@ -499,7 +500,7 @@ async def on_message(text):
                     with open(x.logFile, "a") as f:
                         f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
                     with open(x.csvScore, "a") as f:
-                        f.write("TU#,")
+                        f.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
                     games.append(x)
                 else:
                     report = "You need to run !setup before you can start a game."
@@ -535,7 +536,7 @@ async def on_message(text):
                         with open(games[i].csvScore) as f:
                             body = f.readlines()
                             subMems = body[0]
-                        newLine = "Total:,"
+                        newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
                         with open(games[i].csvScore, "a") as f:
                             for x,y in games[i].scores.items():
                                 newLine += str(y)
