@@ -49,11 +49,11 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* <strike>Undo command.</strike> Implemented in version 1.5.14; deprecated in version 1.6.3. To be fixed.
+* <strike>Undo command.</strike> Implemented in version 1.5.14; deprecated in version 1.6.3. Needs fixes.
 
-* Automatically export scoresheets to Google Sheets
+* Automatically export scoresheets to Google Sheets.
 
-* Score exporting through .csv files.
+* Score exporting through .csv files. In early testing, starting in version 1.6.0.
 
 * Targeted new reader command.
 
