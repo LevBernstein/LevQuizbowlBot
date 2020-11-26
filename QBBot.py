@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.5
+# Version: 1.6.6
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -382,19 +382,26 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             self.lastBonusMem in self.yellowTeam,
             self.lastBonusMem in self.purpleTeam
             )
+        changed = None
         if any(conditions):
             if self.lastBonusMem in self.redTeam:
                 self.redBonus += points
+                changed = self.redBonus
             if self.lastBonusMem in self.blueTeam:
                 self.blueBonus += points
+                changed = self.blueBonus
             if self.lastBonusMem in self.greenTeam:
                 self.greenBonus += points
+                changed = self.greenBonus
             if self.lastBonusMem in self.orangeTeam:
                 self.orangeBonus += points
+                changed = self.orangeBonus
             if self.lastBonusMem in self.yellowTeam:
                 self.yellowBonus += points
+                changed = self.yellowBonus
             if self.lastBonusMem in self.purpleTeam:
                 self.purpleBonus += points
+                changed = self.purpleBonus
         else:
             self.scores[self.lastBonusMem] += points
             selfAdded = True
@@ -404,12 +411,30 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         with open(self.csvScore, "w") as f:
             f.writelines(body)
         print(lastLine)
-        lastLine[1] = self.redBonus
-        lastLine[2] = self.blueBonus
-        lastLine[3] = self.greenBonus
-        lastLine[4] = self.orangeBonus
-        lastLine[5] = self.yellowBonus
-        lastLine[6] = self.purpleBonus
+        lastLine[1] = "0"
+        lastLine[2] = "0"
+        lastLine[3] = "0"
+        lastLine[4] = "0"
+        lastLine[5] = "0"
+        lastLine[6] = "0"
+        searching = True
+        if searching == True and changed == self.redBonus:
+            lastLine[1] = str(points)
+            searching = False
+        if searching == True and changed == self.blueBonus:
+            lastLine[2] = str(points)
+            searching = False
+        if searching == True and changed == self.greenBonus:
+            lastLine[3] = str(points)
+            searching = False
+        if searching == True and changed == self.orangeBonus:
+            lastLine[4] = str(points)
+            searching = False
+        if searching == True and changed == self.yellowBonus:
+            lastLine[5] = str(points)
+            searching = False
+        if searching == True and changed == self.purpleBonus:
+            lastLine[6] = str(points)
         if selfAdded:
             print("selfAdded")
             found = False
@@ -589,7 +614,7 @@ async def on_message(text):
                         newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
                         with open(games[i].csvScore, "a") as f:
                             for x,y in games[i].scores.items():
-                                newLine += str(y)
+                                newLine += str(y) + ","
                             f.write(newLine)
                         games.pop(i)
                         report = "Ended the game active in this channel."
