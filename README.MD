@@ -49,7 +49,7 @@ You can comment out the print statements if they annoy you.
 
 ## To-Do
 
-* <strike>Undo command.</strike> Implemented in version 1.5.14; deprecated in version 1.6.3. Needs fixes.
+* Undo command. Implemented in version 1.5.14; deprecated in version 1.6.3. Needs fixes.
 
 * Automatically export scoresheets to Google Sheets.
 

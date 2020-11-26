@@ -293,14 +293,21 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
-                    with open(self.csvScore) as f:
+                    with open(self.csvScore, "r") as f:
                         body = f.readlines()
                     print("Body 0 = " + body[0])
                     lane = body[0]
-                    newPhrase = mem.name + "," + "\r\n"
-                    lane = lane.replace("\r\n", newPhrase)
-                    body[0] = lane
-                    print("New Body 0 = " + lane)
+                    newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
+                    for x,y in self.scores.items():
+                        newLane += x.name + ","
+                    newLane += mem.name + ",\r\n"
+                    #newPhrase = mem.name + "," + "\r\n"
+                    #lane = lane.replace("\r\n", newPhrase)
+                    #body[0] = lane
+                    print("New Body 0 = " + newLane)
+                    body = ''.join([i for i in body]) \
+                        .replace(lane, newLane)
+                    print(body)
                     with open(self.csvScore, "w") as f:
                         f.writelines(body)
                     self.scores[mem] = points
@@ -347,7 +354,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         break
             if found:
                 #newLine = "\r\n" + str(self.TUnum)
-                newLine = [str(self.TUnum)]
+                newLine = [str(self.TUnum + 1)]
                 for i in range (spot-1):
                     newLine.append('')
                 newLine.append(str(points))
