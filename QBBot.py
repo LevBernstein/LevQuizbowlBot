@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.4
+# Version: 1.6.5
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -296,8 +296,11 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     with open(self.csvScore) as f:
                         body = f.readlines()
                     print("Body 0 = " + body[0])
-                    body[0] += mem.name + "," + "\r\n"
-                    print("New Body 0 = " + body[0])
+                    lane = body[0]
+                    newPhrase = mem.name + "," + "\r\n"
+                    lane = lane.replace("\r\n", newPhrase)
+                    body[0] = lane
+                    print("New Body 0 = " + lane)
                     with open(self.csvScore, "w") as f:
                         f.writelines(body)
                     self.scores[mem] = points
@@ -348,6 +351,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 for i in range (spot-1):
                     newLine.append('')
                 newLine.append(str(points))
+                print(newLine)
                 with open(self.csvScore, "a+", newline='') as f:
                     writer = csv.writer(f)
                     writer.writerow(newLine)
@@ -419,6 +423,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 print(lastLine[spot])
         with open(self.csvScore, "a+", newline='') as f:
             writer = csv.writer(f)
+            print(lastLine)
             writer.writerow(lastLine)
         self.bonusMode = False
         # TODO add points to csv. Don't forget to update TU points as well, just in case teams are disabled.
