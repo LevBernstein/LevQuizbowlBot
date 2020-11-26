@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.3
+# Version: 1.6.4
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -102,6 +102,7 @@ class Backup:
 #   logFile: A log created to track all commands from this particular game. Untracked by .gitignore.
 #   lastNeg: Boolean that tracks whether the last buzz was a 0/-5. Used in undo.
 #   oldScores: A Backup() of a given Instance's scores.
+#   lastTossupPoints: Used for giving bonus points to the individual when playing without teams.
 class Instance: # instance of an active game. Each channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
@@ -139,6 +140,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
         self.lastNeg = False
         self.oldScores = Backup(None)
+        self.lastTossupPoints = 0
 
     def getChannel(self):
         """Return the channel of a given Instance. 
@@ -270,6 +272,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         """
         awarded = False
         if self.active == True:
+            self.lastTossupPoints = points
             mem = self.buzzes.popleft()
             temp = copy.copy(self.oldScores)
             self.oldScores.prev = temp
@@ -359,6 +362,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         if not self.bonusMode:
             return
         temp = copy.copy(self.oldScores)
+        selfAdded = False
         conditions = (
             self.lastBonusMem in self.redTeam,
             self.lastBonusMem in self.blueTeam,
@@ -382,6 +386,40 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 self.purpleBonus += points
         else:
             self.scores[self.lastBonusMem] += points
+            selfAdded = True
+        with open(self.csvScore, "r+") as f:
+            body = f.readlines()
+            lastLine = body.pop().split(',')
+        with open(self.csvScore, "w") as f:
+            f.writelines(body)
+        print(lastLine)
+        lastLine[1] = self.redBonus
+        lastLine[2] = self.blueBonus
+        lastLine[3] = self.greenBonus
+        lastLine[4] = self.orangeBonus
+        lastLine[5] = self.yellowBonus
+        lastLine[6] = self.purpleBonus
+        if selfAdded:
+            print("selfAdded")
+            found = False
+            with open(self.csvScore) as f:
+                body = f.readlines()
+                subMems = body[0].split(',')
+                found = False
+                for i in range(len(subMems)):
+                    if self.lastBonusMem.name == subMems[i]:
+                        spot = i
+                        found = True
+                        break
+            if found:
+                print("found")
+                print(self.lastTossupPoints)
+                print(points)
+                lastLine[spot] = str(self.lastTossupPoints + points)
+                print(lastLine[spot])
+        with open(self.csvScore, "a+", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(lastLine)
         self.bonusMode = False
         # TODO add points to csv. Don't forget to update TU points as well, just in case teams are disabled.
         
@@ -550,6 +588,7 @@ async def on_message(text):
                     break
             await text.channel.send(report)
         
+        """
         # DEPRECATED until I figure out the issue with TUnum tracking.
         if text.content.startswith('!undo'):
             print("calling undo")
@@ -571,7 +610,7 @@ async def on_message(text):
                 else:
                     report = "You are not the reader!"
             await text.channel.send(report)
-        
+        """
         
         if text.content.startswith('!dead'):
             print("calling dead")
@@ -899,7 +938,7 @@ async def on_message(text):
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!team [r/b/g/o/y/p]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
             emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
-            emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
+            # emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
             emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
