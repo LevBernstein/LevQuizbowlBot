@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.7
+# Version: 1.6.8
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -66,6 +66,8 @@ def isBuzz(st):
 # This class is a backup of previous scores, for the purpose of being able to undo an incorrect points assignment.
 # It is essentially a singly linked list with some additional data fields.
 # Parameters: prev is the previous backup of the scores.
+# Local variables that require explaining:
+#   line: a backup of the previous last line of the scoresheet.
 class Backup:
     def __init__(self, prev):
         # TODO store TUnum here as well, to better handle negs
@@ -79,6 +81,7 @@ class Backup:
         self.TUnum = 0
         self.lastNeg = False
         self.prev = prev
+        self.line = ""
 
 #############################################################
 # Instance(self, channel)
@@ -293,6 +296,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
+                    """
                     with open(self.csvScore, "r") as f:
                         body = f.readlines()
                     print("Body 0 = " + body[0])
@@ -310,6 +314,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     print(body)
                     with open(self.csvScore, "w") as f:
                         f.writelines(body)
+                    """
                     self.scores[mem] = points
                     self.active = False
                     self.clear()
@@ -323,6 +328,25 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points
+                    """
+                    with open(self.csvScore, "r") as f:
+                        body = f.readlines()
+                    print("Body 0 = " + body[0])
+                    lane = body[0]
+                    newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
+                    for x,y in self.scores.items():
+                        newLane += x.name + ","
+                    newLane += mem.name + ",\r\n"
+                    #newPhrase = mem.name + "," + "\r\n"
+                    #lane = lane.replace("\r\n", newPhrase)
+                    #body[0] = lane
+                    print("New Body 0 = " + newLane)
+                    body = ''.join([i for i in body]) \
+                        .replace(lane, newLane)
+                    print(body)
+                    with open(self.csvScore, "w") as f:
+                        f.writelines(body)
+                    """
                 if len(self.buzzes) == 0:
                     self.active = False
                 if mem in self.redTeam:
@@ -343,6 +367,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
+            """
             with open(self.csvScore) as f:
                 body = f.readlines()
                 subMems = body[0].split(',')
@@ -353,15 +378,39 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         found = True
                         break
             if found:
-                #newLine = "\r\n" + str(self.TUnum)
-                newLine = [str(self.TUnum + 1)]
-                for i in range (spot-1):
-                    newLine.append('')
-                newLine.append(str(points))
-                print(newLine)
-                with open(self.csvScore, "a+", newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerow(newLine)
+                if self.oldScores.lastNeg: # if there's a neg on the current TU
+                    # split the last line; replace spot with points
+                    with open(self.csvScore, "r") as f:
+                        reader = csv.reader(f, delimiter=',')
+                        count = 0
+                        for row in reader:
+                            count +=1
+                    #count -=1
+                    print(count)
+                    oldLane = body[count]
+                    newLane = body[count].split(',')
+                    print(newLane)
+                    print("New line length: " + str(len(newLane)))
+                    newLane[spot] = str(points)
+                    total = ""
+                    for item in newLane:
+                        total += item + ","
+                    body = ''.join([i for i in body]) \
+                        .replace(oldLane, total)
+                    with open(self.csvScore, "w") as f:
+                        f.writelines(body)
+                else:
+                    newLine = [str(self.TUnum + 1)]
+                    for i in range(6):
+                        newLine.append('0')
+                    for i in range (spot-7):
+                        newLine.append('')
+                    newLine.append(str(points))
+                    print(newLine)
+                    with open(self.csvScore, "a+", newline='') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(newLine)
+        """
         if awarded:
             self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
         return awarded
@@ -405,6 +454,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         else:
             self.scores[self.lastBonusMem] += points
             selfAdded = True
+        """
         with open(self.csvScore, "r+") as f:
             body = f.readlines()
             lastLine = body.pop().split(',')
@@ -457,8 +507,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             writer = csv.writer(f)
             print(lastLine)
             writer.writerow(lastLine)
+        """
         self.bonusMode = False
-        # TODO add points to csv. Don't forget to update TU points as well, just in case teams are disabled.
         
     def bonusStop(self):
         """Kills an active bonus."""
@@ -619,7 +669,7 @@ async def on_message(text):
                         csvName = games[i].csvScore
                         
                         games.pop(i)
-                        report = "Ended the game active in this channel. Here is the scoresheet."
+                        report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
                         role = get(text.guild.roles, name = 'Reader')
                         await text.author.remove_roles(role)
                         await text.channel.send(report)
