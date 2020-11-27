@@ -669,11 +669,12 @@ async def on_message(text):
                         csvName = games[i].csvScore
                         
                         games.pop(i)
-                        report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
+                        #report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
+                        report = "Ended the game active in this channel."
                         role = get(text.guild.roles, name = 'Reader')
                         await text.author.remove_roles(role)
                         await text.channel.send(report)
-                        await text.channel.send(file=discord.File(csvName))
+                        #await text.channel.send(file=discord.File(csvName))
                     else:
                         report = "You are not the reader!"
                         await text.channel.send(report)
