@@ -53,7 +53,7 @@ You can comment out the print statements if they annoy you.
 
 * Automatically export scoresheets to Google Sheets.
 
-* Score exporting through .csv files. Beta version implemented in version 1.6.6.
+* Score exporting through .csv files. Beta version implemented in version 1.6.6; temporarily disabled in public release 1.6.8. Needs fixes.
 
 * Targeted new reader command.
 
