@@ -2,7 +2,9 @@
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
-Originally created for use in the Quiz Bowl at NYU Discord server. 
+Originally created for use in the Quiz Bowl at NYU Discord server.
+
+This bot keeps track of all the boring stuff, allowing you to focus on reading and buzzing. Designed for use in Quizbowl practices over Discord, all you need is a reader and you're good to go.
 
 ## Installation
 
