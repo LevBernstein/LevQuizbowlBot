@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.10
+# Version: 1.6.11
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -218,21 +218,27 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             return False
         return True
     
-    def inTeam(self, mem):
+    def inTeam(self, text, mem):
         """When bonus mode is enabled, this method reports the team of the buzzer."""
         if mem in self.redTeam:
-            return "Red Team"
+            role = get(text.guild.roles, name = 'Team red')
+            return role
         if mem in self.blueTeam:
-            return "Blue Team"
+            role = get(text.guild.roles, name = 'Team blue')
+            return role
         if mem in self.greenTeam:
-            return "Green Team"
+            role = get(text.guild.roles, name = 'Team green')
+            return role
         if mem in self.orangeTeam:
-            return "Orange Team"
+            role = get(text.guild.roles, name = 'Team orange')
+            return role
         if mem in self.yellowTeam:
-            return "Yellow Team"
+            role = get(text.guild.roles, name = 'Team yellow')
+            return role
         if mem in self.purpleTeam:
-            return "Purple Team"
-        return "None"
+            role = get(text.guild.roles, name = 'Team purple')
+            return role
+        return None
     
     def teamScore(self, team, teamBonus):
         """Returns a team's total score, including bonus points."""
@@ -755,11 +761,13 @@ async def on_message(text):
                             storedMem = heldGame.buzzes[0]
                             if heldGame.gain(int(text.content)):
                                 report = "Awarded TU points. "
-                                getTeam = heldGame.inTeam(storedMem)
-                                if getTeam != "None":
-                                    report += "Bonus is for " + getTeam + ". "
+                                getTeam = heldGame.inTeam(text, storedMem)
+                                message = await text.channel.send(report)
+                                if getTeam != None:
+                                    report += "Bonus is for " + getTeam.mention + ". "
                                 report +=  "Awaiting bonus points."
-                                await text.channel.send(report)
+                                sleep(.1)
+                                await message.edit(content=report)
                             else:
                                 while len(heldGame.buzzes) > 0:
                                     if heldGame.canBuzz(heldGame.buzzes[0]):
