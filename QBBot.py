@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.9
+# Version: 1.6.10
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -676,7 +676,7 @@ async def on_message(text):
                             #report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
                             report = "Ended the game active in this channel."
                             role = get(text.guild.roles, name = 'Reader')
-                            await text.author.remove_roles(role)
+                            await heldGame.reader.remove_roles(role)
                             await text.channel.send(report)
                             #await text.channel.send(file=discord.File(csvName))
                         else:
