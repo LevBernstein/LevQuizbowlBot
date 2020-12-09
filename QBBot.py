@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.12
+# Version: 1.6.13
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -745,7 +745,7 @@ async def on_message(text):
                 if text.author.id == heldGame.reader.id:
                     if heldGame.bonusEnabled == False:
                         if heldGame.gain(int(text.content)):
-                            report = "Awarded points. Next TU."
+                            report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                             await text.channel.send(report)
                         else:
                             while len(heldGame.buzzes) > 0:
@@ -780,7 +780,7 @@ async def on_message(text):
                                         # because I don't send a report here, I can't have the text.channel.send(report) at the end; doing so throws an exception because it would be sending an empty message
                         else: # bonusMode true
                             heldGame.bonusGain(int(text.content))
-                            report = "Awarded bonus points. Next TU."
+                            report = "Awarded bonus points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                             await text.channel.send(report)
             
             if text.content.startswith('wd') or text.content.startswith('!wd') or text.content.startswith('withdraw') or text.content.startswith('!withdraw'):
