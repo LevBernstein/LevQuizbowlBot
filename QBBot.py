@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.6.11
+# Version: 1.6.12
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -720,7 +720,7 @@ async def on_message(text):
                 report = "You are not the reader!"
                 if text.author.id == heldGame.reader.id:
                     heldGame.dead()
-                    report = "TU goes dead. Next TU."
+                    report = "TU goes dead. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                 await text.channel.send(report)
             
             if text.content.startswith('!clear'):
