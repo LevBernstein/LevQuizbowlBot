@@ -57,7 +57,7 @@ You can comment out the print statements if they annoy you.
 
 * Score exporting through .csv files. Beta version implemented in version 1.6.6; temporarily disabled in public release 1.6.8. Needs fixes.
 
-* Targeted new reader command.
+* <strike>Targeted new reader command.</strike> Implemented in version 1.7.0.
 
 * <strike>Autocreate required roles and emojis.</strike> Implemented in version 1.5.4.
 
