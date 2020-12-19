@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.0
+# Version: 1.7.1
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -60,6 +60,20 @@ def isBuzz(st):
         return True
     return False
 
+def writeOut(generate, name, content, game, report, spoke):
+    """Saves output of valid commands in the log file.
+    To disable logging, set generateLogs to False in the setup at the top of this file.
+    Generally passed: generate = generateLogs, name = text.author.name, content = text.content, game = heldGame, report = report, spoke = botSpoke
+    So: writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+    """
+    if generate:
+        newline = ( f'{str(datetime.now())[:-5]: <23}' + " " + f'{(name + ":"): >33}' + " " +  content + "\r\n")
+        with open(game.logFile, "a") as f:
+            f.write(newline)
+            if spoke:
+                newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
+                f.write(newline)
+    return
 
 #############################################################
 # Backup(self, prev)
@@ -557,6 +571,7 @@ async def on_message(text):
                 break
         
         if text.content.startswith('!setup'):
+            botSpoke = True
             """Run this command once, after you add the bot the your server. It will handle all role and emoji creation, and set the bot's avatar.
             Please avoid running this command more than once, as doing so will create duplicate emojis. If for whatever reason you have to do so, that's fine, just be prepared to delete those emojis.'
             """
@@ -610,6 +625,9 @@ async def on_message(text):
     
                 report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
             await text.channel.send(report)
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
         
         if text.content.startswith('!summon') or text.content.startswith('!call'):
             print("calling summon")
@@ -618,6 +636,9 @@ async def on_message(text):
             if text.author.guild_permissions.administrator: # this makes sure people can't just ping everyone in the server whenever they want. Only admins can do that.
                 report = "@everyone Time for practice!"
             await text.channel.send(report)
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
     
         if text.content.startswith('!start') or text.content.startswith('!begin') or text.content.startswith('!read'):
             botSpoke = True
@@ -641,10 +662,14 @@ async def on_message(text):
                 else:
                     report = "You need to run !setup before you can start a game."
             await text.channel.send(report)
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
         
         if exist: # These commands only fire if a game is active in the channel in which they are being run.
             if text.content.startswith('!newreader'):
                 print("calling newreader")
+                botSpoke = True
                 target = text.content.split('@', 1)[1]
                 if target.startswith('!'):
                     target = target[1:]
@@ -657,6 +682,8 @@ async def on_message(text):
                 await newReader.add_roles(role)
                 report = "Made " + newReader.mention + " the new reader."
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if text.content.startswith('!end') or text.content.startswith('!stop'):
                 # TODO make end autoexport scoresheet
@@ -676,7 +703,6 @@ async def on_message(text):
                                     newLine += str(y) + ","
                                 f.write(newLine)
                             csvName = games[i].csvScore
-                            
                             games.pop(i)
                             #report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
                             report = "Ended the game active in this channel."
@@ -688,6 +714,8 @@ async def on_message(text):
                             report = "You are not the reader!"
                             await text.channel.send(report)
                         break
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
 
             """
             # DEPRECATED until I fully implement scoresheets and figure out the issue with TUnum tracking.
@@ -711,6 +739,8 @@ async def on_message(text):
                     else:
                         report = "You are not the reader!"
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             """
             
             if text.content.startswith('!dead'):
@@ -721,6 +751,8 @@ async def on_message(text):
                     heldGame.dead()
                     report = "TU goes dead. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if text.content.startswith('!clear'):
                 print("calling clear")
@@ -730,6 +762,8 @@ async def on_message(text):
                     heldGame.clear()
                     report = "Buzzers cleared, anyone can buzz." 
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if isInt(text.content): # Assigns points.
                 print("calling points")
@@ -781,6 +815,8 @@ async def on_message(text):
                             heldGame.bonusGain(int(text.content))
                             report = "Awarded bonus points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                             await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if text.content.startswith('wd') or text.content.startswith('!wd') or text.content.startswith('withdraw') or text.content.startswith('!withdraw'):
                 print("calling withdraw")
@@ -803,6 +839,8 @@ async def on_message(text):
                         else:
                             heldGame.buzzes.popleft()
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if text.content.startswith('!bonusmode') or text.content.startswith('!btoggle'):
                 """Toggles whether bonus mode is enabled. It is enabled by default."""
@@ -816,6 +854,8 @@ async def on_message(text):
                     if heldGame.bonusEnabled:
                         report = "Enabled bonus mode."
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
             
             if text.content.startswith('!bstop'):
                 """Ends current bonus round. Use this to kill a bonus without giving points. Only use if something has gone wrong and you need to kill a bonus immediately."""
@@ -826,6 +866,8 @@ async def on_message(text):
                     heldGame.bonusStop()
                     report = "Killed active bonus. Next TU."
                 await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
         
             if text.content.startswith('!score'):
                 print("calling score")
@@ -858,7 +900,6 @@ async def on_message(text):
                         areTeams = True
                     if areTeams:
                         desc += "\r\n\r\nIndividuals:"
-                    
                 emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                 for x,y in heldGame.scores.items():
                     if x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
@@ -875,6 +916,8 @@ async def on_message(text):
                     emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=True)
                 await text.channel.send(embed=emb)
                 report = "Embedded score."
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
         
             if isBuzz(text.content):
                 print("calling buzz")
@@ -904,7 +947,6 @@ async def on_message(text):
                 if purple in text.author.roles and not text.author in heldGame.purpleTeam:
                     heldGame.purpleTeam.append(text.author)
                     print("Added " + text.author.name +  " to purple on buzz")
-                
                 if heldGame.bonusMode == False:
                     if heldGame.hasBuzzed(text.author):
                         print("You have already buzzed, " + text.author.mention + ".")
@@ -926,6 +968,8 @@ async def on_message(text):
                 else:
                     report = "We are currently playing a bonus. You cannot buzz, " + text.author.mention + "."
                     await text.channel.send(report)
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+                return
         
         if text.content.startswith('!github'):
             print("calling github")
@@ -936,6 +980,9 @@ async def on_message(text):
             emb.add_field(name = "View this bot's source code at:", value = "https://github.com/LevBernstein/LevQuizbowlBot", inline = True)
             await text.channel.send(embed = emb)
             report = "Embedded github."
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
             
         if text.content.startswith('!report'):
             print("calling report")
@@ -945,6 +992,9 @@ async def on_message(text):
             emb.add_field(name = "Report any issues at:", value = "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline = True)
             await text.channel.send(embed = emb)
             report = "Embedded report."
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
     
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
@@ -971,11 +1021,19 @@ async def on_message(text):
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
             await text.channel.send(embed=emb)
             report = "Embedded tutorial."
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
             
-        elif exist and text.content.startswith('!tu'): # elif because otherwise !tutorial calls this too
+        if exist and text.content.startswith('!tu'): # Placed after !help so that it won't fire when someone does !tutorial, a synonym of !help
             print("calling tu")
             report = "Current TU: #" + str(heldGame.TUnum + 1) + "."
             await text.channel.send(report)
+            writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
 
         if text.content.startswith('!export'): # DEPRECATED will autoexport when !end is run
             """ The score will be automatically exported to a CSV file on your local machine.
@@ -987,9 +1045,11 @@ async def on_message(text):
                 emb.add_field(name = "This feature has not been implemented yet!", value= "Make sure to check https://github.com/LevBernstein/LevQuizbowlBot for updates!", inline=False)
                 await text.channel.send(embed=emb)
                 report = "Embedded export."
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
             else:
                 report = "You need to start a game first! Use '!start' to start a game."
                 await text.channel.send(report)
+            return
         
         if text.content.startswith('!team '):
             """ Adds the user to a given team.
@@ -1042,16 +1102,8 @@ async def on_message(text):
             if not rolesExist:
                 report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."
             await text.channel.send(report)
-        
-        if exist and generateLogs:
-            """Saves output of valid commands in the log file.
-            To disable logging, set generateLogs to False in the setup at the top of this file.
-            """
-            newline = ( f'{str(datetime.now())[:-5]: <23}' + " " + f'{(text.author.name + ":"): >33}' + " " +  text.content + "\r\n")
-            with open(heldGame.logFile, "a") as f:
-                f.write(newline)
-                if botSpoke:
-                    newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
-                    f.write(newline)
-        
+            if exist:
+                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
+            return
+       
 client.run(token)
