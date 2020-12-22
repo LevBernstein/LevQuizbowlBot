@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.1
+# Version: 1.7.2
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -634,7 +634,8 @@ async def on_message(text):
             botSpoke = True
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # this makes sure people can't just ping everyone in the server whenever they want. Only admins can do that.
-                report = "@everyone Time for practice!"
+                #report = "@everyone Time for practice!"
+                report = "@everyone **AND I SAW THE SEVEN ANGELS WHICH STOOD BEFORE GOD; AND TO THEM WERE GIVEN SEVEN TRUMPETS. AND ANOTHER ANGEL CAME AND STOOD AT THE ALTAR, HAVING A GOLDEN CENSER; AND THERE WAS GIVEN UNTO HIM MUCH INCENSE, THAT HE SHOULD OFFER IT WITH THE PRAYERS OF ALL SAINTS UPON THE GOLDEN ALTAR WHICH WAS BEFORE THE THRONE. AND THE SMOKE OF THE INCENSE, WHICH CAME WITH THE PRAYERS OF THE SAINTS, ASCENDED UP BEFORE GOD OUT OF THE ANGEL'S HAND. AND THE ANGEL TOOK THE CENSER, AND FILLED IT WITH FIRE OF THE ALTAR, AND CAST IT INTO THE EARTH: AND THERE WERE VOICES, AND THUNDERINGS, AND LIGHTNINGS, AND AN EARTHQUAKE. AND THE SEVEN ANGELS WHICH HAD THE SEVEN TRUMPETS PREPARED THEMSELVES TO SOUND: *IT IS TIME FOR PRACTICE.***"
             await text.channel.send(report)
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
