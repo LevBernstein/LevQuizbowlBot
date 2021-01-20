@@ -1,5 +1,9 @@
 # Lev's Quizbowl Bot
 
+Stable Build: Release 1.7.2
+
+Testing Build: Release 1.7.3
+
 A Discord bot designed for playing Quizbowl, written in Python.
 
 Originally created for use in the Quiz Bowl at NYU Discord server.

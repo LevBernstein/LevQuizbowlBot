@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.2
+# Version: 1.7.3
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -316,7 +316,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
-                    """
                     with open(self.csvScore, "r") as f:
                         body = f.readlines()
                     print("Body 0 = " + body[0])
@@ -336,7 +335,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         print(body)
                         with open(self.csvScore, "w") as f:
                             f.writelines(body)
-                    """
                     self.scores[mem] = points
                     self.active = False
                     self.clear()
@@ -350,7 +348,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points
-                    """
                     with open(self.csvScore, "r") as f:
                         body = f.readlines()
                     print("Body 0 = " + body[0])
@@ -370,7 +367,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         print(body)
                         with open(self.csvScore, "w") as f:
                             f.writelines(body)
-                    """
                 if len(self.buzzes) == 0:
                     self.active = False
                 if mem in self.redTeam:
@@ -391,7 +387,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
-            """
             with open(self.csvScore) as f:
                 body = f.readlines()
                 subMems = body[0].split(',')
@@ -434,7 +429,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     with open(self.csvScore, "a+", newline='') as f:
                         writer = csv.writer(f)
                         writer.writerow(newLine)
-        """
         if awarded:
             self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
         return awarded
@@ -478,7 +472,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         else:
             self.scores[self.lastBonusMem] += points
             selfAdded = True
-        """
         with open(self.csvScore, "r+") as f:
             body = f.readlines()
             lastLine = body.pop().split(',')
@@ -531,7 +524,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             writer = csv.writer(f)
             print(lastLine)
             writer.writerow(lastLine)
-        """
         self.bonusMode = False
         
     def bonusStop(self):
@@ -558,7 +550,6 @@ async def on_message(text):
     report = "" # report is usually what the bot sends in response to valid commands, and, in case a game is active, it is what the bot write to that game's log file.
     text.content=text.content.lower() # for ease of use, all commands are lowercase, and all messages scanned are converted to lowercase.
     current = text.channel.id
-    #print(str(current) + " " + str(datetime.now())[:-5] + " " + text.author.name + ": " + text.content)
     exist = False
     heldGame = None
     botSpoke = False
