@@ -1,8 +1,8 @@
 # Lev's Quizbowl Bot
 
-Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot)
+Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot/releases/tag/v1.7.2)
 
-Testing Build: Release 1.7.3
+Unstable Build: Release 1.7.3
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
