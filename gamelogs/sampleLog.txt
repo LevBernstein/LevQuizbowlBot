@@ -1,0 +1,162 @@
+Start of game in channel 744662149573640285 at 16:43:04.
+
+2021-01-15 16:43:34.9                           thedrich: buzz
+2021-01-15 16:43:34.9                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:43:40.4                             Sunjay: 10
+2021-01-15 16:43:40.4                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:45:16.2                             Sunjay: 10
+2021-01-15 16:45:16.2                                BOT: Awarded bonus points. Moving on to TU #2.
+2021-01-15 16:45:59.8                           thedrich: buzz
+2021-01-15 16:45:59.8                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:46:08.2                             Sunjay: 0
+2021-01-15 16:46:08.2                                BOT: No held buzzes.
+2021-01-15 16:46:23.1                             Sunjay: !dead
+2021-01-15 16:46:23.1                                BOT: TU goes dead. Moving on to TU #3.
+2021-01-15 16:46:26.3                   Captain No-Beard: !score
+2021-01-15 16:46:26.3                                BOT: Embedded score.
+2021-01-15 16:46:57.6                             fryfry: buzz
+2021-01-15 16:46:57.6                                BOT: <@!569218129532682250> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:47:03.4                             Sunjay: 10
+2021-01-15 16:47:03.4                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:47:52.0                             Sunjay: 30
+2021-01-15 16:47:52.0                                BOT: Awarded bonus points. Moving on to TU #4.
+2021-01-15 16:48:34.4                   Captain No-Beard: buzz
+2021-01-15 16:48:34.4                                BOT: <@!196354892208537600> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:48:39.6                             Sunjay: 10
+2021-01-15 16:48:39.6                                BOT: Awarded TU points. Bonus is for <@&687715889520574484>. Awaiting bonus points.
+2021-01-15 16:49:49.2                             Sunjay: 30
+2021-01-15 16:49:49.2                                BOT: Awarded bonus points. Moving on to TU #5.
+2021-01-15 16:50:12.7                            apoorva: buzz
+2021-01-15 16:50:12.7                                BOT: <@!288134479543926785> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:50:19.4                             Sunjay: 10
+2021-01-15 16:50:19.4                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:51:33.8                             Sunjay: 20
+2021-01-15 16:51:33.8                                BOT: Awarded bonus points. Moving on to TU #6.
+2021-01-15 16:51:59.4                           thedrich: buzz
+2021-01-15 16:51:59.4                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:52:05.1                             Sunjay: 10
+2021-01-15 16:52:05.1                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:53:02.1                             Sunjay: 30
+2021-01-15 16:53:02.1                                BOT: Awarded bonus points. Moving on to TU #7.
+2021-01-15 16:53:22.4                           thedrich: buzz
+2021-01-15 16:53:22.4                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:53:23.2                   Captain No-Beard: buzz
+2021-01-15 16:53:23.2                                BOT: Held a buzz.
+2021-01-15 16:53:28.9                             Sunjay: 10
+2021-01-15 16:53:28.9                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:55:08.1                             Sunjay: 10
+2021-01-15 16:55:08.1                                BOT: Awarded bonus points. Moving on to TU #8.
+2021-01-15 16:55:42.7                           thedrich: buzz
+2021-01-15 16:55:42.7                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:55:47.5                             Sunjay: 10
+2021-01-15 16:55:47.5                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:57:09.7                             Sunjay: 30
+2021-01-15 16:57:09.7                                BOT: Awarded bonus points. Moving on to TU #9.
+2021-01-15 16:58:03.7                           thedrich: buzz
+2021-01-15 16:58:03.7                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:58:03.9                             fryfry: buzz
+2021-01-15 16:58:03.9                                BOT: Held a buzz.
+2021-01-15 16:58:05.1                            apoorva: buzz
+2021-01-15 16:58:05.1                                BOT: Held a buzz.
+2021-01-15 16:58:11.0                             Sunjay: 10
+2021-01-15 16:58:11.0                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 16:59:14.1                             Sunjay: 30
+2021-01-15 16:59:14.1                                BOT: Awarded bonus points. Moving on to TU #10.
+2021-01-15 16:59:48.3                   Captain No-Beard: buzz
+2021-01-15 16:59:48.3                                BOT: <@!196354892208537600> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 16:59:49.7                            apoorva: buzz
+2021-01-15 16:59:49.7                                BOT: Held a buzz.
+2021-01-15 17:00:02.5                             Sunjay: -5
+2021-01-15 17:00:02.5                                BOT: <@!288134479543926785> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:00:06.6                            apoorva: wd
+2021-01-15 17:00:06.6                                BOT: Withdrew <@!288134479543926785>'s buzz. 
+2021-01-15 17:00:21.1                             David.: buzz
+2021-01-15 17:00:21.1                                BOT: <@!121672903396687872> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:00:31.4                             Sunjay: 10
+2021-01-15 17:00:31.4                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:01:57.3                             Sunjay: 20
+2021-01-15 17:01:57.3                                BOT: Awarded bonus points. Moving on to TU #11.
+2021-01-15 17:01:59.2                             Sunjay: !score
+2021-01-15 17:01:59.2                                BOT: Embedded score.
+2021-01-15 17:02:47.3                             David.: buzz
+2021-01-15 17:02:47.3                                BOT: <@!121672903396687872> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:02:47.7                   Captain No-Beard: buzz
+2021-01-15 17:02:47.7                                BOT: Held a buzz.
+2021-01-15 17:02:47.9                           thedrich: buzz
+2021-01-15 17:02:47.9                                BOT: Held a buzz.
+2021-01-15 17:02:48.9                            apoorva: buzz
+2021-01-15 17:02:48.9                                BOT: Held a buzz.
+2021-01-15 17:02:54.8                             Sunjay: -5
+2021-01-15 17:02:54.8                                BOT: <@!196354892208537600> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:03:00.7                             Sunjay: 10
+2021-01-15 17:03:00.7                                BOT: Awarded TU points. Bonus is for <@&687715889520574484>. Awaiting bonus points.
+2021-01-15 17:03:43.6                             Sunjay: 30
+2021-01-15 17:03:43.6                                BOT: Awarded bonus points. Moving on to TU #12.
+2021-01-15 17:04:03.5                           thedrich: buzz
+2021-01-15 17:04:03.5                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:04:09.5                             Sunjay: 10
+2021-01-15 17:04:09.5                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:05:33.7                             Sunjay: 20
+2021-01-15 17:05:33.7                                BOT: Awarded bonus points. Moving on to TU #13.
+2021-01-15 17:06:12.0                            apoorva: buzz
+2021-01-15 17:06:12.0                                BOT: <@!288134479543926785> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:06:12.5                           thedrich: buzz
+2021-01-15 17:06:12.5                                BOT: Held a buzz.
+2021-01-15 17:06:21.6                             Sunjay: 10
+2021-01-15 17:06:21.6                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:07:38.8                             Sunjay: 20
+2021-01-15 17:07:38.8                                BOT: Awarded bonus points. Moving on to TU #14.
+2021-01-15 17:08:21.9                   Captain No-Beard: buzz
+2021-01-15 17:08:21.9                                BOT: <@!196354892208537600> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:08:22.1                             David.: buzz
+2021-01-15 17:08:22.1                                BOT: Held a buzz.
+2021-01-15 17:08:22.3                              Parth: buzz
+2021-01-15 17:08:22.3                                BOT: Held a buzz.
+2021-01-15 17:08:27.0                             Sunjay: 10
+2021-01-15 17:08:27.0                                BOT: Awarded TU points. Bonus is for <@&687715889520574484>. Awaiting bonus points.
+2021-01-15 17:09:57.9                             Sunjay: 0
+2021-01-15 17:09:57.9                                BOT: Awarded bonus points. Moving on to TU #15.
+2021-01-15 17:10:25.8                             fryfry: buzz
+2021-01-15 17:10:25.8                                BOT: <@!569218129532682250> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:10:33.7                             Sunjay: 10
+2021-01-15 17:10:33.7                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:12:33.6                             Sunjay: 20
+2021-01-15 17:12:33.6                                BOT: Awarded bonus points. Moving on to TU #16.
+2021-01-15 17:13:10.9                              Parth: buzz
+2021-01-15 17:13:10.9                                BOT: <@274748262572097538> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:13:17.4                             Sunjay: 10
+2021-01-15 17:13:17.4                                BOT: Awarded TU points. Bonus is for <@&687715889520574484>. Awaiting bonus points.
+2021-01-15 17:14:45.6                             Sunjay: 20
+2021-01-15 17:14:45.6                                BOT: Awarded bonus points. Moving on to TU #17.
+2021-01-15 17:15:07.3                            apoorva: buzz
+2021-01-15 17:15:07.3                                BOT: <@!288134479543926785> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:15:17.3                             Sunjay: 10
+2021-01-15 17:15:17.3                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:16:35.9                             Sunjay: 20
+2021-01-15 17:16:35.9                                BOT: Awarded bonus points. Moving on to TU #18.
+2021-01-15 17:17:10.1                            Theresa: buzz
+2021-01-15 17:17:10.1                                BOT: <@460595886188265482> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:17:10.4                           thedrich: buzz
+2021-01-15 17:17:10.4                                BOT: Held a buzz.
+2021-01-15 17:17:26.0                             Sunjay: 10
+2021-01-15 17:17:26.0                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:18:34.5                             Sunjay: 30
+2021-01-15 17:18:34.5                                BOT: Awarded bonus points. Moving on to TU #19.
+2021-01-15 17:18:55.3                             fryfry: buzz
+2021-01-15 17:18:55.3                                BOT: Held a buzz.
+2021-01-15 17:18:55.4                           thedrich: buzz
+2021-01-15 17:18:55.4                                BOT: <@!687786333997236260> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:19:03.0                             Sunjay: 10
+2021-01-15 17:19:03.0                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:20:09.9                             Sunjay: 20
+2021-01-15 17:20:09.9                                BOT: Awarded bonus points. Moving on to TU #20.
+2021-01-15 17:20:44.1                             David.: buzz
+2021-01-15 17:20:44.1                                BOT: <@!121672903396687872> buzzed. Pinging reader: <@688116108792037423>
+2021-01-15 17:20:49.2                             Sunjay: 10
+2021-01-15 17:20:49.2                                BOT: Awarded TU points. Bonus is for <@&687715885800095747>. Awaiting bonus points.
+2021-01-15 17:22:24.5                             Sunjay: 20
+2021-01-15 17:22:24.5                                BOT: Awarded bonus points. Moving on to TU #21.
+2021-01-15 17:22:29.1                             Sunjay: !score
+2021-01-15 17:22:29.1                                BOT: Embedded score.
+2021-01-15 17:22:32.4                   Captain No-Beard: !end
+2021-01-15 17:22:32.4                                BOT: Ended the game active in this channel.
