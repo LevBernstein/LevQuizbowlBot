@@ -1,2 +1,3 @@
-This folder will automatically be filled with log files from each game of Quizbowl.
-The .gitignore prevents those logs from being added to GitHub.
+This folder will automatically be filled with log files and scoresheets from each game of Quizbowl.
+The .gitignore prevents those logs from being tracked and added to GitHub.
+On your own machine, you will likely want to cull this folder periodically.
