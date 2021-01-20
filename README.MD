@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 
-Stable Build: Release 1.7.2
+Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot)
 
 Testing Build: Release 1.7.3
 
