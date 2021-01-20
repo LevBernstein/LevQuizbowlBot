@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.3
+# Version: 1.7.4
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -23,6 +23,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 
+# For Version 2.X.X+
 #from googleapiclient.discovery import build
 #from google_auth_oauthlib.flow import InstalledAppFlow
 #from google.auth.transport.requests import Request
@@ -32,7 +33,7 @@ from discord.utils import get
 # Setup
 f = open("token.txt", "r") # in token.txt, paste in your own Discord API token
 token = f.readline()
-generateLogs = True # if the log files are getting to be too much for you, set this to False
+generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
 client = discord.Client()
 
 # Global helper methods
@@ -47,14 +48,14 @@ def isInt(st):
     return st.isdigit()
 
 def isBuzz(st):
-    """Checks if an entered string is a valid buzz."""
+    """Checks if an entered string is a valid buzz. If you want to allow additional means of buzzing, add them to validBuzzes."""
     validBuzzes = (
         st.startswith('buz'),
         st.startswith('<:buzz:'),
         st.startswith('bz'),
         st.startswith('!bz'),
         st.startswith('!buz'),
-        st.startswith('<:bee:'),
+        st.startswith('<:bee:')
         )
     if any(validBuzzes):
         return True
@@ -81,7 +82,8 @@ def writeOut(generate, name, content, game, report, spoke):
 # It is essentially a singly linked list with some additional data fields.
 # Parameters: prev is the previous backup of the scores.
 # Local variables that require explaining:
-#   line: a backup of the previous last line of the scoresheet.
+#   line: a backup of the previous bottom line of the scoresheet.
+# Will be used starting in Version 1.9.X.
 class Backup:
     def __init__(self, prev):
         # TODO store TUnum here as well, to better handle negs
@@ -117,9 +119,9 @@ class Backup:
 #   red/blue/.../purpleNeg: Booleans tracking if a team is locked out from buzzing due to a member of their team negging.
 #   red/blue/.../purpleBonus: The number of points each team has earned on bonuses so far.
 #   logFile: A log created to track all commands from this particular game. Untracked by .gitignore.
+#   lastTossupPoints: Used for giving bonus points to the individual when playing without teams.
 #   lastNeg: Boolean that tracks whether the last buzz was a 0/-5. Used in undo.
 #   oldScores: A Backup() of a given Instance's scores.
-#   lastTossupPoints: Used for giving bonus points to the individual when playing without teams.
 class Instance: # instance of an active game. Each channel a game is run in gets its own instance. You cannot have more than one game per channel.
     def __init__(self, channel):
         self.channel = channel
@@ -155,9 +157,10 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.logFile = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log")
         self.csvScore = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv")
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
+        self.lastTossupPoints = 0
+        # Used starting in Version 1.9.X:
         self.lastNeg = False
         self.oldScores = Backup(None)
-        self.lastTossupPoints = 0
 
     def getChannel(self):
         """Return the channel of a given Instance. 
@@ -190,6 +193,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.active = False
     
     def dead(self):
+        """Marks a Tossup as dead, clears the buzzes and buzzed arrays, and advances TUnum."""
         temp = copy.copy(self.oldScores)
         self.oldScores.prev = temp
         self.oldScores.scores = copy.copy(self.scores)
@@ -269,7 +273,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         return False
     
     def undo(self):
-        """Reverts scores back to one tossup ago."""
+        """Reverts scores back to one tossup ago. Currently has major problems; see Issue #7 on the GitHub Issues page."""
         self.scores = copy.copy(self.oldScores.scores)
         self.redBonus = self.oldScores.redBonus
         self.blueBonus = self.oldScores.blueBonus
@@ -397,7 +401,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         found = True
                         break
             if found:
-                if self.oldScores.lastNeg: # if there's a neg on the current TU
+                if self.oldScores.lastNeg: # if there has already been a neg on the current TU:
                     # split the last line; replace spot with points
                     with open(self.csvScore, "r") as f:
                         reader = csv.reader(f, delimiter=',')
@@ -534,13 +538,13 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         else:
             print("Could not stop a bonus!")
     
-games = [] # Array holding all active games
+games = [] # Array holding all active games across all channels and servers.
 
 
 @client.event
 async def on_ready():
     """Ready message for when the bot is online."""
-    await client.change_presence(activity=discord.Game(name='Ready to play QB!'))
+    await client.change_presence(activity=discord.Game(name='Quiz Bowl!'))
     print("Activity live!")
     print("Quizbowl Bot online!")
 
@@ -569,9 +573,9 @@ async def on_message(text):
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 await text.channel.send("Starting setup...")
-                # This block handles role creation. The bot requires these roles to function, so if you don't make them, the bot will.
-                willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar.
-                if not get(text.guild.roles, name = 'Reader'):
+                # This block handles role creation. The bot requires these roles to function, so it will make them when you run !setup.
+                willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar. If for some reason you don't want teams displayed separately, set this to False.
+                if not get(text.guild.roles, name = 'Reader'): # To avoid making duplicate roles, the Bot checks to see if these roles exist before making them.
                     await text.guild.create_role(name = 'Reader', colour = discord.Colour(0x01ffdd), hoist = willHoist)
                     print("Created Reader.")
                 if not get(text.guild.roles, name = 'Team red'):
@@ -611,7 +615,7 @@ async def on_message(text):
                 
                 g = open("templates/pfp.png", "rb")
                 pic = g.read()
-                await client.user.edit(avatar=pic)
+                await client.user.edit(avatar=pic) # Running !setup too many times will cause the Discord API to deny API calls that try to change the profile picture.
                 print("Avatar live!")
     
                 report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
@@ -681,7 +685,7 @@ async def on_message(text):
                 return
             
             if text.content.startswith('!end') or text.content.startswith('!stop'):
-                # TODO make end autoexport scoresheet
+                # TODO make !end autoexport scoresheet
                 print("calling end")
                 botSpoke = True
                 report = "You do not currently have an active game."
@@ -703,11 +707,11 @@ async def on_message(text):
                             #report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
                             report = "Ended the game active in this channel."
                             role = get(text.guild.roles, name = 'Reader')
-                            await heldGame.reader.remove_roles(role)
+                            await heldGame.reader.remove_roles(role) # The Reader is stored as a Member object in heldGame, so any admin can end the game and the Reader role will be removed.
                             await text.channel.send(report)
                             #await text.channel.send(file=discord.File(csvName))
                         else:
-                            report = "You are not the reader!"
+                            report = "You are not the reader or a server admin!"
                             await text.channel.send(report)
                         break
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
