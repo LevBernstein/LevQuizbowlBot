@@ -272,8 +272,9 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             return True
         return False
     
+    """
     def undo(self):
-        """Reverts scores back to one tossup ago. Currently has major problems; see Issue #7 on the GitHub Issues page."""
+        # Reverts scores back to one tossup ago. Currently has major problems; see Issue #7 on the GitHub Issues page.
         self.scores = copy.copy(self.oldScores.scores)
         self.redBonus = self.oldScores.redBonus
         self.blueBonus = self.oldScores.blueBonus
@@ -283,14 +284,13 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.purpleBonus = self.oldScores.purpleBonus
         self.oldScores = self.oldScores.prev
         self.TUnum = self.oldScores.TUnum
-        """
         if self.lastNeg:
             self.TUnum += 1
             self.oldScores.TUnum += 1
-        """
         self.lastNeg = self.oldScores.lastNeg
         self.clear()
-        
+    """
+    
     def gain(self, points):
         """Awards points to the player at the front of the buzzes queue. 
         If the points awarded is a positive number, they have gotten a TU correct, so it moves on to a bonus if those are enabled. Returns true.
@@ -410,18 +410,21 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                             count +=1
                     #count -=1
                     print(count)
-                    oldLane = body[count]
-                    newLane = body[count].split(',')
-                    print(newLane)
-                    print("New line length: " + str(len(newLane)))
-                    newLane[spot] = str(points)
-                    total = ""
-                    for item in newLane:
-                        total += item + ","
-                    body = ''.join([i for i in body]) \
-                        .replace(oldLane, total)
-                    with open(self.csvScore, "w") as f:
-                        f.writelines(body)
+                    try:
+                        oldLane = body[count]
+                        newLane = body[count].split(',')
+                        print(newLane)
+                        print("New line length: " + str(len(newLane)))
+                        newLane[spot] = str(points)
+                        total = ""
+                        for item in newLane:
+                            total += item + ","
+                        body = ''.join([i for i in body]) \
+                            .replace(oldLane, total)
+                        with open(self.csvScore, "w") as f:
+                            f.writelines(body)
+                    except IndexError:
+                        print("IndexErro!")
                 else:
                     newLine = [str(self.TUnum + 1)]
                     for i in range(6):
