@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.10
+# Version: 1.7.11
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -448,7 +448,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         if not self.bonusMode:
             return
         temp = copy.copy(self.oldScores)
-        selfAdded = False
         conditions = (
             self.lastBonusMem in self.redTeam,
             self.lastBonusMem in self.blueTeam,
@@ -479,7 +478,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 changed = 5
         else:
             self.scores[self.lastBonusMem] += points
-            selfAdded = True
         with open(self.csvScore, "r+") as f:
             body = f.readlines()
             lastLine = body.pop().split(',')
@@ -493,24 +491,25 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         lastLine[5] = "0"
         lastLine[6] = "0"
         searching = True
-        if searching and changed == 0:
-            lastLine[1] = str(points)
-            searching = False
-        if searching and changed == 1:
-            lastLine[2] = str(points)
-            searching = False
-        if searching and changed == 2:
-            lastLine[3] = str(points)
-            searching = False
-        if searching and changed == 3
-            lastLine[4] = str(points)
-            searching = False
-        if searching and changed == 4
-            lastLine[5] = str(points)
-            searching = False
-        if searching and changed == 5:
-            lastLine[6] = str(points)
-        if selfAdded:
+        if changed != -1:
+            if searching and changed == 0:
+                lastLine[1] = str(points)
+                searching = False
+            if searching and changed == 1:
+                lastLine[2] = str(points)
+                searching = False
+            if searching and changed == 2:
+                lastLine[3] = str(points)
+                searching = False
+            if searching and changed == 3
+                lastLine[4] = str(points)
+                searching = False
+            if searching and changed == 4
+                lastLine[5] = str(points)
+                searching = False
+            if searching and changed == 5:
+                lastLine[6] = str(points)
+        else:
             print("selfAdded")
             found = False
             with open(self.csvScore) as f:
