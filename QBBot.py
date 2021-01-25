@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.5
+# Version: 1.7.9
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -423,8 +423,9 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                             .replace(oldLane, total)
                         with open(self.csvScore, "w") as f:
                             f.writelines(body)
-                    except IndexError:
-                        print("IndexErro!")
+                    except IndexError as err: # TODO fix indexerror that pops up from time to time
+                        print("IndexError!")
+                        print(err)
                 else:
                     newLine = [str(self.TUnum + 1)]
                     for i in range(6):
