@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.9
+# Version: 1.7.10
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -457,26 +457,26 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             self.lastBonusMem in self.yellowTeam,
             self.lastBonusMem in self.purpleTeam
             )
-        changed = None
+        changed = -1
         if any(conditions):
             if self.lastBonusMem in self.redTeam:
                 self.redBonus += points
-                changed = self.redBonus
+                changed = 0
             if self.lastBonusMem in self.blueTeam:
                 self.blueBonus += points
-                changed = self.blueBonus
+                changed = 1
             if self.lastBonusMem in self.greenTeam:
                 self.greenBonus += points
-                changed = self.greenBonus
+                changed = 2
             if self.lastBonusMem in self.orangeTeam:
                 self.orangeBonus += points
-                changed = self.orangeBonus
+                changed = 3
             if self.lastBonusMem in self.yellowTeam:
                 self.yellowBonus += points
-                changed = self.yellowBonus
+                changed = 4
             if self.lastBonusMem in self.purpleTeam:
                 self.purpleBonus += points
-                changed = self.purpleBonus
+                changed = 5
         else:
             self.scores[self.lastBonusMem] += points
             selfAdded = True
@@ -493,22 +493,22 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         lastLine[5] = "0"
         lastLine[6] = "0"
         searching = True
-        if searching == True and changed == self.redBonus:
+        if searching and changed == 0:
             lastLine[1] = str(points)
             searching = False
-        if searching == True and changed == self.blueBonus:
+        if searching and changed == 1:
             lastLine[2] = str(points)
             searching = False
-        if searching == True and changed == self.greenBonus:
+        if searching and changed == 2:
             lastLine[3] = str(points)
             searching = False
-        if searching == True and changed == self.orangeBonus:
+        if searching and changed == 3
             lastLine[4] = str(points)
             searching = False
-        if searching == True and changed == self.yellowBonus:
+        if searching and changed == 4
             lastLine[5] = str(points)
             searching = False
-        if searching == True and changed == self.purpleBonus:
+        if searching and changed == 5:
             lastLine[6] = str(points)
         if selfAdded:
             print("selfAdded")
