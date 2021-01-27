@@ -34,10 +34,10 @@ yourself is a good idea.
 
 ### Setup
 
-After adding the bot to your server, run the command !setup (only admins can use this command). This will create the required roles and emojis.
+After adding the bot to your server, run the command !setup (only users with the "Administrator" permission can use this command). This will create the required roles and emojis.
 
-The bot requires the existence of a reader role and team roles; it will create those for you when you run !setup, but you can also make them yourself if you so wish.
-Newly created roles are, by default, lowest in the role hierarchy; if you want team roles to make everyone look like their team's color, make sure the team roles the bot uses
+The bot requires the existence of a reader role and team roles; it will create those for you when you run !setup.
+Newly created roles are, by default, lowest in the role hierarchy; if you want to make everyone display their team color, make sure the team roles the bot uses
 are higher in the role hierarchy than whatever other non-admin roles are giving people their color.
 
 In addition to giving points by entering numbers, the bot allows you to give points through Discord emojis.
@@ -45,6 +45,7 @@ These emojis must have the names :neg:, :power:, and :ten:. You can also buzz wi
 The bot will create these emojis for you when you run !setup.
 Provided in "templates/emoji" are images used for those emotes in the NYU QB server, as created by Theresa Nyowheoma.
 The bot will use those images for the emojis, but you can also replace them with images of your own, if you so desire.
+You will still be able to buzz with those emojis if you change the images, so long as their names are still neg, power, and ten.
 
 ### Running the bot
 
@@ -52,6 +53,8 @@ In the *nix command line, cd to the directory containing QBBot.py. Then run "pyt
 
 The bot outputs a lot to the command line, just because I like having a lot of information available.
 You can comment out the print statements if they annoy you.
+In addition, the bot creates a new log file for each game (and a .csv scoresheet [WIP]).
+If you want to disable log file generation, set generateLogs to False in the Setup section of QBBot.py (~Line 36).
 
 ## To-Do
 
@@ -59,7 +62,7 @@ You can comment out the print statements if they annoy you.
 
 * Automatically export scoresheets to Google Sheets.
 
-* Score exporting through .csv files. Beta version implemented in version 1.6.6; temporarily disabled in public release 1.6.8. Needs fixes.
+* Score exporting through .csv files. Beta version implemented in version 1.6.6; temporarily disabled in public release 1.6.8. In progress in versions >= 1.7.3.
 
 * <strike>Targeted new reader command.</strike> Implemented in version 1.7.0.
 
