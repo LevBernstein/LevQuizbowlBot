@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.7.13
+# Version: 1.8.0
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -15,6 +15,7 @@ import operator
 from collections import deque, OrderedDict
 import copy
 import csv
+from Summon import *
 #import pickle
 #import os.path
 
@@ -635,15 +636,7 @@ async def on_message(text):
             botSpoke = True
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # this makes sure people can't just ping everyone in the server whenever they want. Only admins can do that.
-                """
-                report = "@everyone Time for practice!"
-                report = "@everyone **AND I SAW THE SEVEN ANGELS WHICH STOOD BEFORE GOD; AND TO THEM WERE GIVEN SEVEN TRUMPETS. AND ANOTHER ANGEL CAME AND STOOD AT THE ALTAR, HAVING A GOLDEN CENSER; AND THERE WAS GIVEN UNTO HIM MUCH INCENSE, THAT HE SHOULD OFFER IT WITH THE PRAYERS OF ALL SAINTS UPON THE GOLDEN ALTAR WHICH WAS BEFORE THE THRONE. AND THE SMOKE OF THE INCENSE, WHICH CAME WITH THE PRAYERS OF THE SAINTS, ASCENDED UP BEFORE GOD OUT OF THE ANGEL'S HAND. AND THE ANGEL TOOK THE CENSER, AND FILLED IT WITH FIRE OF THE ALTAR, AND CAST IT INTO THE EARTH: AND THERE WERE VOICES, AND THUNDERINGS, AND LIGHTNINGS, AND AN EARTHQUAKE. AND THE SEVEN ANGELS WHICH HAD THE SEVEN TRUMPETS PREPARED THEMSELVES TO SOUND: *IT IS TIME FOR PRACTICE.***
-                report = "@everyone **AND I SAW THE SEVEN ANGEWS WHICH STOOD BEFOWOE GOD; AND TO THEM WEWE GIVEN SEVEN TWUMPETS. AND ANYOTHEW ANGEW CAME AND STOWOD AT THE AWTAW, HAVING A GOWODEN CENSEW; AND THEWE WAS GIVEN UNTOWO HIM MUCH INCENSE, THAT HE SHOWOUWD OFFEW IT WITH THE PWAYEWS OF AWW SAINTS UPON THE GOWODEN AWTAW WHICH WAS BEFOWE THE THOWONE. AND THE SMOWOKE OF THE INCENSE, WHICH CAME WITH THE PWAYEWS OF THE SAINTS, ASCENDED UP BEFOWOE GOD OUT OF THE ANGEW'S HAND. AND THE ANGEW TOOK THE CENSEW, AND FIWWED IT WITH FIWE OF THE AWTAW, AND CAST IT INTO THE EAWTH: AND THEWE WEWE VOICES, AND THUNDEWINGS, AND WIGHTNYINGS, AND AN EAWTHQUAKE. AND THE SEVEN ANGEWS WHICH HAD THE SEVEN TWUMPETS PWEPAWED THEMSEWVES TO SOWOUND: *IT IS TIME FOW PWACTICE.***
-                report = "@everyone Let us go then, you and I,\nWhen the evening is spread out against the sky\nLike a patient etherized upon a table;\nLet us go, through certain half-deserted streets,\nThe muttering retreats\nOf restless nights in one-night cheap hotels\nAnd sawdust restaurants with oyster-shells:\nStreets that follow like a tedious argument\nOf insidious intent\nTo lead you to an overwhelming question ...\nOh, do not ask, “What is it?”\nBecause it's obviously time for Quiz Bowl practice, ya dingus."
-                report = "Naea Michael Jackson is a Niuean journalist and former politician.\nIn the 1970s and 1980s, he was government printer and government press photographer in Niue. He published the Tohi Tala Niue, Niue's government-owned weekly newspaper. In 1991, he set up a private printing business, and, in 1993, launched the weekly Niue Star,[1] which at the time was the country's only printed newspaper. Jackson is the Star's owner, editor, journalist and photographer.\nAlso in 1993, Jackson stood successfully for Parliament in that year's general election. He later became an associate minister, and remained a member of Parliament until 2008, when he was defeated in the general election. He stated that there was \"no conflict of interest\" between his being a journalist and a member of government, because \"we have a law to prevent us MPs from taking advantage of our positions\".\nHe is reportedly better known in Niue than his internationally more famous namesake, to the point that, when news of singer Michael Jackson's death reached Niue in July 2009, \"most residents of the remote coral atoll (sic) thought that it was him (sic) who had died\".\nUh anyway it's time for Quiz Bowl practice @everyone"
-                """
-                report = "The car's on fire, and there's no driver at the wheel\nAnd the sewers are all muddied with a thousand lonely suicides\nAnd a dark wind blows\nThe government is corrupt\nAnd we're on so many drugs\nWith the radio on and the curtains drawn\nWe're trapped in the belly of this horrible machine\nAnd the machine is bleeding to death\nThe sun has fallen down\nAnd the billboards are all leering\nAnd the flags are all dead at the top of their poles\nIt went like this:\nThe buildings toppled in on themselves\nMothers clutching babies\nPicked through the rubble\nAnd pulled out their hair\nThe skyline was beautiful on fire\nAll twisted metal stretching upwards\nEverything washed in a thin orange haze\nI said, \"Kiss me, you're beautiful -\nThese are truly the last days\"\nYou grabbed my hand\nAnd we fell into it\nLike a daydream\nOr a fever\nWe woke up one morning and fell a little further down\nFor sure it's the valley of death\nI open up my wallet\nAnd it's full of blood\nAnyway, it's time for practice @everyone"
-                
+                report = summon() # For the full list of summon messages, check Summon.py.
             await text.channel.send(report)
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
