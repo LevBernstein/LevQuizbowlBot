@@ -2,3 +2,4 @@ token*
 *.log
 *.swp
 *.csv
+__pycache__
