@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.1
+# Version: 1.8.2
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -257,7 +257,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         if mem in self.purpleTeam:
             role = get(text.guild.roles, name = 'Team purple')
             return role
-        return Nonea
+        return None
     
     def teamScore(self, team, teamBonus):
         """Returns a team's total score, including bonus points."""
