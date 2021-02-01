@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.0
+# Version: 1.8.1
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -542,7 +542,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         else:
             print("Could not stop a bonus!")
     
-games = [] # Array holding all active games across all channels and servers.
+games = [] # Array holding all active games across all channels and servers. If this bot sees sufficiently large usage, I will switch to something more sorted to store the games, like a binary tree or a 2-3 tree. Games would be sorted based on channel ID.
 
 
 @client.event
@@ -577,6 +577,7 @@ async def on_message(text):
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 await text.channel.send("Starting setup...")
+                report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
                 # This block handles role creation. The bot requires these roles to function, so it will make them when you run !setup.
                 willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar. If for some reason you don't want teams displayed separately, set this to False.
                 if not get(text.guild.roles, name = 'Reader'): # To avoid making duplicate roles, the Bot checks to see if these roles exist before making them.
@@ -624,14 +625,15 @@ async def on_message(text):
                         print("Avatar live!")
                     except discord.HTTPException: # In case of the above issue:
                         print("Avatar failed to update!")
+                        report += " Failed to update the Bot's profile picture."
     
-                report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
             await text.channel.send(report)
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
             return
         
         if text.content.startswith('!summon') or text.content.startswith('!call'):
+            """Mentions everyone in the server, pinging them and informing them that it is time for practice."""
             print("calling summon")
             botSpoke = True
             report = "This command is only usable by server admins!"
@@ -690,10 +692,8 @@ async def on_message(text):
                 # TODO make !end autoexport scoresheet
                 print("calling end")
                 botSpoke = True
-                report = "You do not currently have an active game."
                 for i in range(len(games)):
                     if current == games[i].getChannel():
-                        exist = True
                         if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
                             with open(games[i].csvScore) as f:
                                 body = f.readlines()
@@ -706,12 +706,12 @@ async def on_message(text):
                             csvName = games[i].csvScore
                             games.pop(i)
                             # TODO: scoresheet exporting through uploaded .csv
-                            #report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
-                            report = "Ended the game active in this channel."
+                            report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
+                            #report = "Ended the game active in this channel."
                             role = get(text.guild.roles, name = 'Reader')
                             await heldGame.reader.remove_roles(role) # The Reader is stored as a Member object in heldGame, so any admin can end the game and the Reader role will be removed.
                             await text.channel.send(report)
-                            #await text.channel.send(file=discord.File(csvName))
+                            await text.channel.send(file=discord.File(csvName, filename="scoresheet.csv"))
                         else:
                             report = "You are not the reader or a server admin!"
                             await text.channel.send(report)
@@ -724,22 +724,20 @@ async def on_message(text):
             if text.content.startswith('!undo'):
                 print("calling undo")
                 botSpoke = True
-                report = "You need to start a game first! Use '!start' to start a game."
-                if exist:
-                    if text.author.id == heldGame.reader.id:
-                        if heldGame.bonusMode:
-                            report = "Finish your bonus first!"
-                        else:
-                            if heldGame.active:
-                                report = "Assign TU points first!"
-                            else:
-                                if heldGame.TUnum == 0 and len(heldGame.scores) == 0:
-                                    report = "Nothing to undo."
-                                else:
-                                    heldGame.undo()
-                                    report = "Undid last Tossup scorechange."
+                if text.author.id == heldGame.reader.id:
+                    if heldGame.bonusMode:
+                        report = "Finish your bonus first!"
                     else:
-                        report = "You are not the reader!"
+                        if heldGame.active:
+                            report = "Assign TU points first!"
+                        else:
+                            if heldGame.TUnum == 0 and len(heldGame.scores) == 0:
+                                report = "Nothing to undo."
+                            else:
+                                heldGame.undo()
+                                report = "Undid last Tossup scorechange."
+                else:
+                    report = "You are not the reader!"
                 await text.channel.send(report)
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
                 return
@@ -924,7 +922,7 @@ async def on_message(text):
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
                 return
         
-            if isBuzz(text.content):
+            if isBuzz(text.content): # Uses the isBuzz() helper method to dermine if somene is buzzing
                 print("calling buzz")
                 botSpoke = True
                 # This block handles all team assignment that was done before the game started.
@@ -967,7 +965,7 @@ async def on_message(text):
                                 report = "Held a buzz."
                                 print("Buzzed!")
                                 # because I don't want the bot to say anything if you buzz when someone has been recognized, each conditional needs its own await send.
-                        else: # Might want to remove this if it causes too much clutter.
+                        else:
                             report = "Your team is locked out of buzzing, " + text.author.mention + "."
                             await text.channel.send(report)
                 else:
