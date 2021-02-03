@@ -2,7 +2,9 @@
 
 Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot/releases/tag/v1.7.2)
 
-Unstable Build: [Rewrite Branch](https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite)
+Unstable Build: Release 1.8.2
+
+Pandas Rewrite Branch: [In development here](https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite)
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
