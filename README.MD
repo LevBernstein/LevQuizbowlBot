@@ -58,6 +58,8 @@ If you want to disable log file generation, set generateLogs to False in the Set
 
 ## To-Do
 
+* Switch to Pandas for .csv scoresheets.
+
 * Undo command. Implemented in version 1.5.14; deprecated in version 1.6.3. Needs fixes.
 
 * Automatically export scoresheets to Google Sheets.
