@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.2
+# Version: 1.8.3
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -15,6 +15,7 @@ import operator
 from collections import deque, OrderedDict
 import copy
 import csv
+import pandas as pd
 from Summon import *
 #import pickle
 #import os.path
