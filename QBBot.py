@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.3
+# Version: 1.8.4
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -154,8 +154,6 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.orangeBonus = 0
         self.yellowBonus = 0
         self.purpleBonus = 0
-        #self.logFile = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log"), "a")
-        #self.csvScore = open(("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"), "a")
         self.logFile = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".log")
         self.csvScore = ("gamelogs/" + str(self.getChannel())[-5:] + "-" + datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv")
         # log and scoresheet filename format: channelID-YYYY-mm-DD-HH-MM-SS
@@ -322,25 +320,22 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
-                    with open(self.csvScore, "r") as f:
-                        body = f.readlines()
-                    print("Body 0 = " + body[0])
-                    lane = body[0]
-                    test = lane.split(",")
-                    if mem.name not in test:
-                        newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
-                        for x,y in self.scores.items():
-                            newLane += x.name + ","
-                        newLane += mem.name + ",\r\n"
-                        #newPhrase = mem.name + "," + "\r\n"
-                        #lane = lane.replace("\r\n", newPhrase)
-                        #body[0] = lane
-                        print("New Body 0 = " + newLane)
-                        body = ''.join([i for i in body]) \
-                            .replace(lane, newLane)
-                        print(body)
-                        with open(self.csvScore, "w") as f:
-                            f.writelines(body)
+                    #with open(self.csvScore, "r") as f:
+                        #body = f.readlines()
+                    #print("Body 0 = " + body[0])
+                    #lane = body[0]
+                    #test = lane.split(",")
+                    #if mem.name not in test:
+                        #newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
+                        #for x,y in self.scores.items():
+                            #newLane += x.name + ","
+                        #newLane += mem.name + ",\r\n"
+                        #print("New Body 0 = " + newLane)
+                        #body = ''.join([i for i in body]) \
+                            #.replace(lane, newLane)
+                        #print(body)
+                        #with open(self.csvScore, "w") as f:
+                            #f.writelines(body)
                     self.scores[mem] = points
                     self.active = False
                     self.clear()
@@ -354,25 +349,22 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points
-                    with open(self.csvScore, "r") as f:
-                        body = f.readlines()
-                    print("Body 0 = " + body[0])
-                    lane = body[0]
-                    test = lane.split(",")
-                    if mem.name not in test:
-                        newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
-                        for x,y in self.scores.items():
-                            newLane += x.name + ","
-                        newLane += mem.name + ",\r\n"
-                        #newPhrase = mem.name + "," + "\r\n"
-                        #lane = lane.replace("\r\n", newPhrase)
-                        #body[0] = lane
-                        print("New Body 0 = " + newLane)
-                        body = ''.join([i for i in body]) \
-                            .replace(lane, newLane)
-                        print(body)
-                        with open(self.csvScore, "w") as f:
-                            f.writelines(body)
+                    #with open(self.csvScore, "r") as f:
+                        #body = f.readlines()
+                    #print("Body 0 = " + body[0])
+                    #lane = body[0]
+                    #test = lane.split(",")
+                    #if mem.name not in test:
+                        #newLane = "TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,"
+                        #for x,y in self.scores.items():
+                            #newLane += x.name + ","
+                        #newLane += mem.name + ",\r\n"
+                        #print("New Body 0 = " + newLane)
+                        #body = ''.join([i for i in body]) \
+                            #.replace(lane, newLane)
+                        #print(body)
+                        #with open(self.csvScore, "w") as f:
+                            #f.writelines(body)
                 if len(self.buzzes) == 0:
                     self.active = False
                 if mem in self.redTeam:
@@ -393,52 +385,50 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
-            with open(self.csvScore) as f:
-                body = f.readlines()
-                subMems = body[0].split(',')
-                found = False
-                for i in range(len(subMems)):
-                    if mem.name == subMems[i]:
-                        spot = i
-                        found = True
-                        break
-            if found:
-                if self.oldScores.lastNeg: # if there has already been a neg on the current TU:
-                    # split the last line; replace spot with points
-                    with open(self.csvScore, "r") as f:
-                        reader = csv.reader(f, delimiter=',')
-                        count = 0
-                        for row in reader:
-                            count +=1
-                    #count -=1
-                    print(count)
-                    try:
-                        oldLane = body[count]
-                        newLane = body[count].split(',')
-                        print(newLane)
-                        print("New line length: " + str(len(newLane)))
-                        newLane[spot] = str(points)
-                        total = ""
-                        for item in newLane:
-                            total += item + ","
-                        body = ''.join([i for i in body]) \
-                            .replace(oldLane, total)
-                        with open(self.csvScore, "w") as f:
-                            f.writelines(body)
-                    except IndexError as err: # TODO fix indexerror that pops up from time to time
-                        print("IndexError!")
-                        print(err)
-                else:
-                    newLine = [str(self.TUnum + 1)]
-                    for i in range(6):
-                        newLine.append('0')
-                    for i in range (spot-7):
-                        newLine.append('')
-                    newLine.append(str(points))
-                    print(newLine)
-                    with open(self.csvScore, "a+", newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow(newLine)
+            #with open(self.csvScore) as f:
+                #body = f.readlines()
+                #subMems = body[0].split(',')
+                #found = False
+                #for i in range(len(subMems)):
+                    #if mem.name == subMems[i]:
+                        #spot = i
+                        #found = True
+                        #break
+            #if found:
+                #if self.oldScores.lastNeg: # if there has already been a neg on the current TU:
+                    #with open(self.csvScore, "r") as f :# split the last line; replace spot with points
+                        #reader = csv.reader(f, delimiter=',')
+                        #count = 0
+                        #for row in reader:
+                            #count +=1
+                    #print(count)
+                    #try:
+                        #oldLane = body[count]
+                        #newLane = body[count].split(',')
+                        #print(newLane)
+                        #print("New line length: " + str(len(newLane)))
+                        #newLane[spot] = str(points)
+                        #total = ""
+                        #for item in newLane:
+                            #total += item + ","
+                        #body = ''.join([i for i in body]) \
+                            #.replace(oldLane, total)
+                        #with open(self.csvScore, "w") as f:
+                            #f.writelines(body)
+                    #except IndexError as err: # TODO fix indexerror that pops up from time to time
+                        #print("IndexError!")
+                        #print(err)
+                #else:
+                    #newLine = [str(self.TUnum + 1)]
+                    #for i in range(6):
+                        #newLine.append('0')
+                    #for i in range (spot-7):
+                        #newLine.append('')
+                    #newLine.append(str(points))
+                    #print(newLine)
+                    #with open(self.csvScore, "a+", newline='') as f:
+                        #writer = csv.writer(f)
+                        #writer.writerow(newLine)
         if awarded:
             self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
         return awarded
@@ -480,59 +470,59 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 changed = 5
         else:
             self.scores[self.lastBonusMem] += points
-        with open(self.csvScore, "r+") as f:
-            body = f.readlines()
-            lastLine = body.pop().split(',')
-        with open(self.csvScore, "w") as f:
-            f.writelines(body)
-        print(lastLine)
-        lastLine[1] = "0"
-        lastLine[2] = "0"
-        lastLine[3] = "0"
-        lastLine[4] = "0"
-        lastLine[5] = "0"
-        lastLine[6] = "0"
-        searching = True
-        if changed != -1:
-            if searching and changed == 0:
-                lastLine[1] = str(points)
-                searching = False
-            if searching and changed == 1:
-                lastLine[2] = str(points)
-                searching = False
-            if searching and changed == 2:
-                lastLine[3] = str(points)
-                searching = False
-            if searching and changed == 3:
-                lastLine[4] = str(points)
-                searching = False
-            if searching and changed == 4:
-                lastLine[5] = str(points)
-                searching = False
-            if searching and changed == 5:
-                lastLine[6] = str(points)
-        else:
-            print("selfAdded")
-            found = False
-            with open(self.csvScore) as f:
-                body = f.readlines()
-                subMems = body[0].split(',')
-                found = False
-                for i in range(len(subMems)):
-                    if self.lastBonusMem.name == subMems[i]:
-                        spot = i
-                        found = True
-                        break
-            if found:
-                print("found")
-                print(self.lastTossupPoints)
-                print(points)
-                lastLine[spot] = str(self.lastTossupPoints + points)
-                print(lastLine[spot])
-        with open(self.csvScore, "a+", newline='') as f:
-            writer = csv.writer(f)
-            print(lastLine)
-            writer.writerow(lastLine)
+        #with open(self.csvScore, "r+") as f:
+            #body = f.readlines()
+            #lastLine = body.pop().split(',')
+        #with open(self.csvScore, "w") as f:
+            #f.writelines(body)
+        #print(lastLine)
+        #lastLine[1] = "0"
+        #lastLine[2] = "0"
+        #lastLine[3] = "0"
+        #lastLine[4] = "0"
+        #lastLine[5] = "0"
+        #lastLine[6] = "0"
+        #searching = True
+        #if changed != -1:
+            #if searching and changed == 0:
+                #lastLine[1] = str(points)
+                #searching = False
+            #if searching and changed == 1:
+                #lastLine[2] = str(points)
+                #searching = False
+            #if searching and changed == 2:
+                #lastLine[3] = str(points)
+                #searching = False
+            #if searching and changed == 3:
+                #lastLine[4] = str(points)
+                #searching = False
+            #if searching and changed == 4:
+                #lastLine[5] = str(points)
+                #searching = False
+            #if searching and changed == 5:
+                #lastLine[6] = str(points)
+        #else:
+            #print("selfAdded")
+            #found = False
+            #with open(self.csvScore) as f:
+                #body = f.readlines()
+                #subMems = body[0].split(',')
+                #found = False
+                #for i in range(len(subMems)):
+                    #if self.lastBonusMem.name == subMems[i]:
+                        #spot = i
+                        #found = True
+                        #break
+            #if found:
+                #print("found")
+                #print(self.lastTossupPoints)
+                #print(points)
+                #lastLine[spot] = str(self.lastTossupPoints + points)
+                #print(lastLine[spot])
+        #with open(self.csvScore, "a+", newline='') as f:
+            #writer = csv.writer(f)
+            #print(lastLine)
+            #writer.writerow(lastLine)
         self.bonusMode = False
         
     def bonusStop(self):
@@ -662,7 +652,8 @@ async def on_message(text):
                     with open(x.logFile, "a") as f:
                         f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
                     with open(x.csvScore, "a") as f:
-                        f.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
+                        #f.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
+                        pass
                     games.append(x)
                 else:
                     report = "You need to run !setup before you can start a game."
@@ -696,18 +687,18 @@ async def on_message(text):
                 for i in range(len(games)):
                     if current == games[i].getChannel():
                         if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
-                            with open(games[i].csvScore) as f:
-                                body = f.readlines()
-                                subMems = body[0]
-                            newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
-                            with open(games[i].csvScore, "a") as f:
-                                for x,y in games[i].scores.items():
-                                    newLine += str(y) + ","
-                                f.write(newLine)
+                            #with open(games[i].csvScore) as f:
+                                #body = f.readlines()
+                                #subMems = body[0]
+                            #newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
+                            #with open(games[i].csvScore, "a") as f:
+                                #for x,y in games[i].scores.items():
+                                    #newLine += str(y) + ","
+                                #f.write(newLine)
                             csvName = games[i].csvScore
                             games.pop(i)
                             # TODO: scoresheet exporting through uploaded .csv
-                            report = "Ended the game active in this channel. Here is the scoresheet (scoresheet exporting is still in early Beta; this scoresheet may not be accurate)."
+                            report = "Ended the game active in this channel. Here is the scoresheet (I am rewriting all the code involving the scoresheet; it will be extremely inaccurate for some time)."
                             #report = "Ended the game active in this channel."
                             role = get(text.guild.roles, name = 'Reader')
                             await heldGame.reader.remove_roles(role) # The Reader is stored as a Member object in heldGame, so any admin can end the game and the Reader role will be removed.
