@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.6
+# Version: 1.8.7
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -776,33 +776,31 @@ async def on_message(text):
                 report = "Null"
                 if text.author.id == heldGame.reader.id:
                     if heldGame.bonusEnabled == False:
-                        if len(heldGame.buzzes) > 0:
-                            if heldGame.gain(int(text.content)):
-                                report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
-                                await text.channel.send(report)
-                            else:
-                                report = "No held buzzes."
-                                while len(heldGame.buzzes) > 0:
-                                    if heldGame.canBuzz(heldGame.buzzes[0]):
-                                        report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
-                                        await text.channel.send(report)
-                                        break
-                                    else:
-                                        heldGame.buzzes.popleft() # Pop until we find someone who can buzz, or until the array of buzzes is empty.
-                                        report = "Cannot buzz."
+                        if heldGame.gain(int(text.content)):
+                            report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
+                            await text.channel.send(report)
+                        else:
+                            report = "No held buzzes."
+                            while len(heldGame.buzzes) > 0:
+                                if heldGame.canBuzz(heldGame.buzzes[0]):
+                                    report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
+                                    await text.channel.send(report)
+                                    break
+                                else:
+                                    heldGame.buzzes.popleft() # Pop until we find someone who can buzz, or until the array of buzzes is empty.
+                                    report = "Cannot buzz."
                     else: # bonuses enabled
                         if heldGame.bonusMode == False:
-                            if len(heldGame.buzzes) > 0:
-                                storedMem = heldGame.buzzes[0]
-                                if heldGame.gain(int(text.content)):
-                                    report = "Awarded TU points. "
-                                    getTeam = heldGame.inTeam(text, storedMem)
-                                    message = await text.channel.send(report)
-                                    if getTeam != None:
-                                        report += "Bonus is for " + getTeam.mention + ". "
-                                    report +=  "Awaiting bonus points."
-                                    await asyncio.sleep(.1)
-                                    await message.edit(content=report)
+                            storedMem = heldGame.buzzes[0]
+                            if heldGame.gain(int(text.content)):
+                                report = "Awarded TU points. "
+                                getTeam = heldGame.inTeam(text, storedMem)
+                                message = await text.channel.send(report)
+                                if getTeam != None:
+                                    report += "Bonus is for " + getTeam.mention + ". "
+                                report +=  "Awaiting bonus points."
+                                await asyncio.sleep(.1)
+                                await message.edit(content=report)
                             else:
                                 report = "No held buzzes."
                                 while len(heldGame.buzzes) > 0:
