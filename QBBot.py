@@ -1,40 +1,42 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.4
+# Version: 1.8.5
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
 # you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
 # make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot).
 
+# Default libraries:
 from __future__ import print_function
-from time import sleep
+import asyncio
 from datetime import datetime, date, timezone
 import random as random
 import operator
 from collections import deque, OrderedDict
 import copy
 import csv
-import pandas as pd
-from Summon import *
 #import pickle
 #import os.path
 
-
+# Installed libraries:
 import discord
 from discord.ext import commands
 from discord.utils import get
-
-# For Version 2.X.X+
+import pandas as pd
 #from googleapiclient.discovery import build
 #from google_auth_oauthlib.flow import InstalledAppFlow
 #from google.auth.transport.requests import Request
 
+# Custom libraries:
+from Summon import *
+
 
 
 # Setup
-f = open("token.txt", "r") # in token.txt, paste in your own Discord API token
-token = f.readline()
+token = ""
+with open("token.txt", "r") as f: # in token.txt, paste in your own Discord API token
+    token = f.readline()
 generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
 client = discord.Client()
 
@@ -70,7 +72,7 @@ def writeOut(generate, name, content, game, report, spoke):
     So: writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
     """
     if generate:
-        newline = ( f'{str(datetime.now())[:-5]: <23}' + " " + f'{(name + ":"): >33}' + " " +  content + "\r\n")
+        newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{(name + ":"): >33}' + " " +  content + "\r\n")
         with open(game.logFile, "a") as f:
             f.write(newline)
             if spoke:
@@ -681,7 +683,6 @@ async def on_message(text):
                 return
             
             if text.content.startswith('!end') or text.content.startswith('!stop'):
-                # TODO make !end autoexport scoresheet
                 print("calling end")
                 botSpoke = True
                 for i in range(len(games)):
@@ -697,8 +698,7 @@ async def on_message(text):
                                 #f.write(newLine)
                             csvName = games[i].csvScore
                             games.pop(i)
-                            # TODO: scoresheet exporting through uploaded .csv
-                            report = "Ended the game active in this channel. Here is the scoresheet (I am rewriting all the code involving the scoresheet; it will be extremely inaccurate for some time)."
+                            report = "Ended the game active in this channel. Here is the scoresheet (I am rewriting all the code involving the scoresheet; it will be extremely inaccurate for some time. Scoresheets are currently empty)."
                             #report = "Ended the game active in this channel."
                             role = get(text.guild.roles, name = 'Reader')
                             await heldGame.reader.remove_roles(role) # The Reader is stored as a Member object in heldGame, so any admin can end the game and the Reader role will be removed.
@@ -769,7 +769,7 @@ async def on_message(text):
                 botSpoke = True
                 report = "Null"
                 if text.author.id == heldGame.reader.id:
-                    if heldGame.bonusEnabled == False:
+                    if heldGame.bonusEnabled == False and len(heldGame.buzzes) > 0:
                         if heldGame.gain(int(text.content)):
                             report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
                             await text.channel.send(report)
@@ -784,7 +784,7 @@ async def on_message(text):
                                     heldGame.buzzes.popleft() # Pop until we find someone who can buzz, or until the array of buzzes is empty.
                                     report = "Cannot buzz."
                     else: # bonuses enabled
-                        if heldGame.bonusMode == False:
+                        if heldGame.bonusMode == False and len(heldGame.buzzes) > 0::
                             storedMem = heldGame.buzzes[0]
                             if heldGame.gain(int(text.content)):
                                 report = "Awarded TU points. "
@@ -793,7 +793,7 @@ async def on_message(text):
                                 if getTeam != None:
                                     report += "Bonus is for " + getTeam.mention + ". "
                                 report +=  "Awaiting bonus points."
-                                sleep(.1)
+                                await asyncio.sleep(.1)
                                 await message.edit(content=report)
                             else:
                                 report = "No held buzzes."
