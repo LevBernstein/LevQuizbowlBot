@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.5
+# Version: 1.8.6
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -16,6 +16,7 @@ import operator
 from collections import deque, OrderedDict
 import copy
 import csv
+from sys import exit
 #import pickle
 #import os.path
 
@@ -35,8 +36,13 @@ from Summon import *
 
 # Setup
 token = ""
-with open("token.txt", "r") as f: # in token.txt, paste in your own Discord API token
-    token = f.readline()
+try:
+    with open("token.txt", "r") as f: # in token.txt, paste in your own Discord API token
+        token = f.readline()
+except:
+    print("Error! Could not read token.txt!")
+    sys.exit(-1)
+    
 generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
 client = discord.Client()
 
@@ -769,32 +775,34 @@ async def on_message(text):
                 botSpoke = True
                 report = "Null"
                 if text.author.id == heldGame.reader.id:
-                    if heldGame.bonusEnabled == False and len(heldGame.buzzes) > 0:
-                        if heldGame.gain(int(text.content)):
-                            report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
-                            await text.channel.send(report)
-                        else:
-                            report = "No held buzzes."
-                            while len(heldGame.buzzes) > 0:
-                                if heldGame.canBuzz(heldGame.buzzes[0]):
-                                    report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
-                                    await text.channel.send(report)
-                                    break
-                                else:
-                                    heldGame.buzzes.popleft() # Pop until we find someone who can buzz, or until the array of buzzes is empty.
-                                    report = "Cannot buzz."
-                    else: # bonuses enabled
-                        if heldGame.bonusMode == False and len(heldGame.buzzes) > 0::
-                            storedMem = heldGame.buzzes[0]
+                    if heldGame.bonusEnabled == False:
+                        if len(heldGame.buzzes) > 0:
                             if heldGame.gain(int(text.content)):
-                                report = "Awarded TU points. "
-                                getTeam = heldGame.inTeam(text, storedMem)
-                                message = await text.channel.send(report)
-                                if getTeam != None:
-                                    report += "Bonus is for " + getTeam.mention + ". "
-                                report +=  "Awaiting bonus points."
-                                await asyncio.sleep(.1)
-                                await message.edit(content=report)
+                                report = "Awarded points. Moving on to TU #" + str(heldGame.TUnum + 1) + "."
+                                await text.channel.send(report)
+                            else:
+                                report = "No held buzzes."
+                                while len(heldGame.buzzes) > 0:
+                                    if heldGame.canBuzz(heldGame.buzzes[0]):
+                                        report = (heldGame.buzzes[0]).mention + " buzzed. Pinging reader: " + str(heldGame.reader.mention)
+                                        await text.channel.send(report)
+                                        break
+                                    else:
+                                        heldGame.buzzes.popleft() # Pop until we find someone who can buzz, or until the array of buzzes is empty.
+                                        report = "Cannot buzz."
+                    else: # bonuses enabled
+                        if heldGame.bonusMode == False:
+                            if len(heldGame.buzzes) > 0:
+                                storedMem = heldGame.buzzes[0]
+                                if heldGame.gain(int(text.content)):
+                                    report = "Awarded TU points. "
+                                    getTeam = heldGame.inTeam(text, storedMem)
+                                    message = await text.channel.send(report)
+                                    if getTeam != None:
+                                        report += "Bonus is for " + getTeam.mention + ". "
+                                    report +=  "Awaiting bonus points."
+                                    await asyncio.sleep(.1)
+                                    await message.edit(content=report)
                             else:
                                 report = "No held buzzes."
                                 while len(heldGame.buzzes) > 0:
