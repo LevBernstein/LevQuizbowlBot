@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.7
+# Version: 1.8.8
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -41,7 +41,7 @@ try:
         token = f.readline()
 except:
     print("Error! Could not read token.txt!")
-    sys.exit(-1)
+    exit(-1)
     
 generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
 client = discord.Client()
