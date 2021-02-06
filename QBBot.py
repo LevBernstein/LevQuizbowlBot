@@ -16,7 +16,7 @@ import operator
 from collections import deque, OrderedDict
 import copy
 import csv
-from sys import exit
+from sys import exit as sysExit
 #import pickle
 #import os.path
 
@@ -41,7 +41,7 @@ try:
         token = f.readline()
 except:
     print("Error! Could not read token.txt!")
-    exit(-1)
+    sysExit(-1)
     
 generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
 client = discord.Client()
