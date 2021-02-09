@@ -28,7 +28,7 @@ yourself is a good idea.
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
 
-* Pandas. To install, run "pip install pandas"
+* Pandas (exclusive to rewrite branch). To install, run "pip install pandas"
 
 * Future versions will require the Google Client Library; this version does not. To install it, run "pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
 
