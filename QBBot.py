@@ -7,7 +7,7 @@
 # you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
 # make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite).
 
-# Default libraries:
+# Default modules:
 from __future__ import print_function
 import asyncio
 from datetime import datetime, date, timezone
@@ -20,7 +20,7 @@ from sys import exit as sysExit
 #import pickle
 #import os.path
 
-# Installed libraries:
+# Installed modules:
 import discord
 from discord.ext import commands
 from discord.utils import get
@@ -29,7 +29,7 @@ import pandas as pd
 #from google_auth_oauthlib.flow import InstalledAppFlow
 #from google.auth.transport.requests import Request
 
-# Custom libraries:
+# Custom modules:
 from Summon import *
 
 
