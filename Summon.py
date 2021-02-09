@@ -1,6 +1,6 @@
 # Summon messages for Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.0.2
+# Version: 1.0.3
 # This file just consists of the summon messages for !summon. For the actual meat of the bot's code, see QBBot.py.
 
 import random as random
@@ -37,6 +37,8 @@ def summon():
         
         "Dearest creature in creation\nStudying English pronunciation,\nI will teach you in my verse\nSounds like corpse, corps, horse and worse.\n\nSword and sward, retain and Britain\n(Mind the latter how it's written).\nMade has not the sound of bade,\nSay-said, pay-paid, laid but plaid.\n\nDon't you think so, reader, rather,\nSaying lather, bather, father?\nFinally, which rhymes with enough,\nThough, through, bough, cough, hough, sough, tough??\n\nHiccough has the sound of sup...\nMy advice is: GIVE IT UP! Play Quiz Bowl instead. @everyone should, in fact, because it's time for practice.",
         
-        "Smoke rises vertically\nSmoke drifts with air\nWeather vanes active, wind felt on face, leaves rustle\nTwigs move, light flags extend\nBranches sway, dust & loose paper blows about\nSmall trees sway, waves break on inland waters\nLarge branches sway, umbrellas difficult to use\nWhole trees sway\nTwigs broken off trees, walking made difficult\nShingles blown off roof\nTrees uprooted, damage to buildings\nWidespread damage, very rare occurrence\nViolent destruction.\n\nToday's Quiz Bowl practice brought to you by the Beaufort Wind Scale @everyone"
+        "Smoke rises vertically\nSmoke drifts with air\nWeather vanes active, wind felt on face, leaves rustle\nTwigs move, light flags extend\nBranches sway, dust & loose paper blows about\nSmall trees sway, waves break on inland waters\nLarge branches sway, umbrellas difficult to use\nWhole trees sway\nTwigs broken off trees, walking made difficult\nShingles blown off roof\nTrees uprooted, damage to buildings\nWidespread damage, very rare occurrence\nViolent destruction.\n\nToday's Quiz Bowl practice brought to you by the Beaufort Wind Scale @everyone",
+        
+        "What sphinx of cement and aluminum bashed open their skulls and ate up their brains and imagination?\nMoloch! Solitude! Filth! Ugliness! Ashcans and unobtainable dollars! Children screaming under the stairways! Boys sobbing in armies! Old men weeping in the parks!\nMoloch! Moloch! Nightmare of Moloch! Moloch the loveless! Mental Moloch! Moloch the heavy judger of men!\nMoloch whose mind is pure machinery! Moloch whose blood is running money! Moloch whose fingers are ten armies! Moloch whose breast is a cannibal dynamo! Moloch whose ear is a smoking tomb!\nMoloch whose eyes are a thousand blind windows! Moloch whose skyscrapers stand in the long streets like endless Jehovahs! Moloch whose factories dream and croak in the fog! Moloch whose smoke-stacks and antennae crown the cities!\nMoloch! Mol--och, excuse me, I had something in my throat. @everyone it's time for practice."
         ]
     return random.choice(reports)
