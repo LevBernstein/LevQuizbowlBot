@@ -1,6 +1,6 @@
 # Summon messages for Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.0.1
+# Version: 1.0.2
 # This file just consists of the summon messages for !summon. For the actual meat of the bot's code, see QBBot.py.
 
 import random as random
@@ -35,6 +35,8 @@ def summon():
         
         "I long thought, where\nthe tiger on the street came from.\nI thought & thought,\nThought & thought\nThought & thought\nThought & thought\nAnd at that time the wind blew\nAnd I forgot what I was thinking about.\nAnd so I don't know\nwhere the tiger on the street came from.\nThat poem is Тигр на улице by Даниил Хармс, translated by Van Holthenrichs. I have no segue here. @everyone it's time for practice.",
         
-        "Dearest creature in creation\nStudying English pronunciation,\nI will teach you in my verse\nSounds like corpse, corps, horse and worse.\n\nSword and sward, retain and Britain\n(Mind the latter how it's written).\nMade has not the sound of bade,\nSay-said, pay-paid, laid but plaid.\n\nDon't you think so, reader, rather,\nSaying lather, bather, father?\nFinally, which rhymes with enough,\nThough, through, bough, cough, hough, sough, tough??\n\nHiccough has the sound of sup...\nMy advice is: GIVE IT UP! Play Quiz Bowl instead. @everyone should, in fact, because it's time for practice."
+        "Dearest creature in creation\nStudying English pronunciation,\nI will teach you in my verse\nSounds like corpse, corps, horse and worse.\n\nSword and sward, retain and Britain\n(Mind the latter how it's written).\nMade has not the sound of bade,\nSay-said, pay-paid, laid but plaid.\n\nDon't you think so, reader, rather,\nSaying lather, bather, father?\nFinally, which rhymes with enough,\nThough, through, bough, cough, hough, sough, tough??\n\nHiccough has the sound of sup...\nMy advice is: GIVE IT UP! Play Quiz Bowl instead. @everyone should, in fact, because it's time for practice.",
+        
+        "Smoke rises vertically\nSmoke drifts with air\nWeather vanes active, wind felt on face, leaves rustle\nTwigs move, light flags extend\nBranches sway, dust & loose paper blows about\nSmall trees sway, waves break on inland waters\nLarge branches sway, umbrellas difficult to use\nWhole trees sway\nTwigs broken off trees, walking made difficult\nShingles blown off roof\nTrees uprooted, damage to buildings\nWidespread damage, very rare occurrence\nViolent destruction.\n\nToday's Quiz Bowl practice brought to you by the Beaufort Wind Scale @everyone"
         ]
     return random.choice(reports)
