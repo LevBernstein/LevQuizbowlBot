@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.9
+# Version: 1.8.10
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -8,23 +8,21 @@
 # make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite).
 
 # Default modules:
-from __future__ import print_function
 import asyncio
-from datetime import datetime, date, timezone
-import random as random
-import operator
-from collections import deque, OrderedDict
 import copy
 import csv
+from collections import deque, OrderedDict
+from datetime import datetime
+from operator import itemgetter
 from sys import exit as sysExit
 #import pickle
 #import os.path
 
 # Installed modules:
 import discord
+import pandas as pd
 from discord.ext import commands
 from discord.utils import get
-import pandas as pd
 #from googleapiclient.discovery import build
 #from google_auth_oauthlib.flow import InstalledAppFlow
 #from google.auth.transport.requests import Request
@@ -661,6 +659,7 @@ async def on_message(text):
                         f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
                     with open(x.csvScore, "a") as f:
                         #f.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
+                        # Currently creates the scoresheet and does nothing else.
                         pass
                     games.append(x)
                 else:
@@ -907,7 +906,7 @@ async def on_message(text):
                         diction[x.name] = y
                     else:
                         diction[x.nick] = y
-                sortedDict = OrderedDict(sorted(diction.items(), key = operator.itemgetter(1)))
+                sortedDict = OrderedDict(sorted(diction.items(), key = itemgetter(1)))
                 print(sortedDict)
                 for x, y in sortedDict.items():
                     names.append(x)
@@ -974,10 +973,8 @@ async def on_message(text):
         
         if text.content.startswith('!github'):
             print("calling github")
-            #gitImage = discord.File("templates/github.png", filename="templates/github.png")
             botSpoke = True
             emb = discord.Embed(title = "Lev's Quizbowl Bot", description = "", color = 0x57068C)
-            #await text.channel.send("https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite")
             emb.add_field(name = "View this bot's source code at:", value = "https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite", inline = True)
             await text.channel.send(embed = emb)
             report = "Embedded github."
@@ -989,7 +986,6 @@ async def on_message(text):
             print("calling report")
             botSpoke = True
             emb = discord.Embed(title = "Report bugs or suggest features", description = "", color = 0x57068C)
-            #await text.channel.send("Report any issues at:\r\nhttps://github.com/LevBernstein/LevQuizbowlBot/issues")
             emb.add_field(name = "Report any issues at:", value = "https://github.com/LevBernstein/LevQuizbowlBot/issues", inline = True)
             await text.channel.send(embed = emb)
             report = "Embedded report."
@@ -1016,7 +1012,7 @@ async def on_message(text):
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!newreader <@user>", value= "Changes a game's reader to another user.", inline=True)
             emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
-            # emb.add_field(name= "!undo", value= "Undoes the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
+            # emb.add_field(name= "!undo", value= "Reverts the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
             emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
@@ -1035,24 +1031,8 @@ async def on_message(text):
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
             return
-
-        if text.content.startswith('!export'): # DEPRECATED will autoexport when !end is run
-            """ The score will be automatically exported to a CSV file on your local machine.
-            What the !export command will do, when implemented, is write that to a Google Sheet and send that to the server.
-            TODO export score to CSV. Requires tracking score for each TU and switching bonuses to a binary system a la online scoresheets made by Ophir."""
-            if exist:
-                exportedTime = str(datetime.now())[:-5]
-                emb = discord.Embed(title="Exported scoresheet at " + exportedTime + ".", description="", color=0x57068C)
-                emb.add_field(name = "This feature has not been implemented yet!", value= "Make sure to check https://github.com/LevBernstein/LevQuizbowlBot for updates!", inline=False)
-                await text.channel.send(embed=emb)
-                report = "Embedded export."
-                writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
-            else:
-                report = "You need to start a game first! Use '!start' to start a game."
-                await text.channel.send(report)
-            return
         
-        if text.content.startswith('!team '):
+        if text.content.startswith('!team'):
             """ Adds the user to a given team.
             Teams require the following roles: Team red, Team blue, Team green, Team orange, Team yellow, Team purple.
             If you do not have those roles in your server, the bot will create them for you when you run !setup. 
@@ -1062,43 +1042,43 @@ async def on_message(text):
             """
             print("calling team")
             botSpoke = True
-            report = "Invalid role!"
+            report = "Please choose a valid team! Valid teams are red, blue, green, orange, yellow, and purple."
             rolesExist = False
             if text.content.startswith('!team r'):
                 role = get(text.guild.roles, name = 'Team red')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team red role, " + text.author.mention + "."
                     rolesExist = True
-            if text.content.startswith('!team b'):
+            elif text.content.startswith('!team b'):
                 role = get(text.guild.roles, name = 'Team blue')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team blue role, " + text.author.mention + "."
                     rolesExist = True
-            if text.content.startswith('!team g'):
+            elif text.content.startswith('!team g'):
                 role = get(text.guild.roles, name = 'Team green')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team green role, " + text.author.mention + "."
                     rolesExist = True
-            if text.content.startswith('!team o'):
+            elif text.content.startswith('!team o'):
                 role = get(text.guild.roles, name = 'Team orange')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team orange role, " + text.author.mention + "."
                     rolesExist = True
-            if text.content.startswith('!team y'):
+            elif text.content.startswith('!team y'):
                 role = get(text.guild.roles, name = 'Team yellow')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team yellow role, " + text.author.mention + "."
                     rolesExist = True
-            if text.content.startswith('!team p'):
+            elif text.content.startswith('!team p'):
                 role = get(text.guild.roles, name = 'Team purple')
                 if role:
                     await text.author.add_roles(role)
-                    report = "Gave you the role, " + text.author.mention + "."
+                    report = "Gave you the Team purple role, " + text.author.mention + "."
                     rolesExist = True
             if not rolesExist:
                 report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."

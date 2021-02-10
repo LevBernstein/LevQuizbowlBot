@@ -1,9 +1,9 @@
 # Summon messages for Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.0.5
+# Version: 1.0.6
 # This file just consists of the summon messages for !summon. For the actual meat of the bot's code, see QBBot.py.
 
-import random as random
+from random import choice
 
 def summon():
     reports = [
@@ -39,4 +39,4 @@ def summon():
         
         "Behold the chariot of the Fairy Queen!\nCelestial coursers paw the unyielding air;\nTheir filmy pennons at her word they furl,\nAnd stop obedient to the reins of light;\nThese the Queen of Spells drew in;\nShe spread a charm around the spot,\nAnd, leaning graceful from the ethereal car,\nLong did she gaze, and silently,\nshe pinged @everyone, saying,\n\"It is time for Quiz Bowl practice.\"\nText is: Queen Mab, Percy Bysshe Shelley."
         ]
-    return random.choice(reports)
+    return choice(reports)
