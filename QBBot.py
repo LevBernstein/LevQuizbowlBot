@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.10
+# Version: 1.8.11
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -42,6 +42,7 @@ except:
     sysExit(-1)
     
 generateLogs = True # if the log files are getting to be too much for you, set this to False. Scoresheet exporting will still work.
+verbosePings = True
 client = discord.Client()
 
 # Global helper methods
@@ -635,7 +636,9 @@ async def on_message(text):
             botSpoke = True
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # this makes sure people can't just ping everyone in the server whenever they want. Only admins can do that.
-                report = summon() # For the full list of summon messages, check Summon.py.
+                report = "@everyone it's time for Quiz Bowl practice."
+                if verbosePings:
+                    report = summon() # For the full list of summon messages, check Summon.py.
             await text.channel.send(report)
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)

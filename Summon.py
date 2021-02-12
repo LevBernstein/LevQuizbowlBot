@@ -1,6 +1,6 @@
 # Summon messages for Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.0.6
+# Version: 1.0.7
 # This file just consists of the summon messages for !summon. For the actual meat of the bot's code, see QBBot.py.
 
 from random import choice
@@ -37,6 +37,10 @@ def summon():
         
         "The rat men accused me of not liking stench, of not liking garbage, of not liking their squeals\nOf not liking to eat dirt!\nFor days they argued, considering the question from every angle\nFinally, they condemned me.\nYou don't like stench! You don't like garbage, you don't like our squeals! You don't like to eat dirt!\nPerhaps you'd be better off at Quiz Bowl practice. @everyone it's time for practice right now, in fact.\nText is: Nightmare, Hanns Eisler.",
         
-        "Behold the chariot of the Fairy Queen!\nCelestial coursers paw the unyielding air;\nTheir filmy pennons at her word they furl,\nAnd stop obedient to the reins of light;\nThese the Queen of Spells drew in;\nShe spread a charm around the spot,\nAnd, leaning graceful from the ethereal car,\nLong did she gaze, and silently,\nshe pinged @everyone, saying,\n\"It is time for Quiz Bowl practice.\"\nText is: Queen Mab, Percy Bysshe Shelley."
+        "Behold the chariot of the Fairy Queen!\nCelestial coursers paw the unyielding air;\nTheir filmy pennons at her word they furl,\nAnd stop obedient to the reins of light;\nThese the Queen of Spells drew in;\nShe spread a charm around the spot,\nAnd, leaning graceful from the ethereal car,\nLong did she gaze, and silently,\nshe pinged @everyone, saying,\n\"It is time for Quiz Bowl practice.\"\nText is: Queen Mab, Percy Bysshe Shelley.",
+        
+        "For oft, when on my couch I lie\nIn vacant or in pensive mood,\nThey flash upon that inward eye\nWhich is the bliss of solitude;\nAnd then my heart with pleasure rings,\nAnd dances with the Discord pings.\n\n@everyone it's time for Quiz Bowl Practice.\nText is: I Wandered Lonely as a Cloud, William Wordsworth.",
+        
+        "That with buzzing loud and long,\nI would make that neg in air,\nThat tossup lost! those games all thrown!\nAnd all who heard should see me there,\nAnd all should cry, Beware! Beware!\nHis finger fast, without a care!\nHis negs are all his own,\nSo close your eyes with holy dread\nFor he on arrogance hath fed,\nAnd our massive lead he hath blown.\n\n@everyone it's time for Quiz Bowl practice.\nText is: Kubla Khan, Samuel Taylor Coleridge."
         ]
     return choice(reports)
