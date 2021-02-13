@@ -55,10 +55,12 @@ In the *nix command line, cd to the directory containing QBBot.py. Then run "pyt
 
 The bot outputs a lot to the command line, just because I like having a lot of information available.
 You can comment out the print statements if they annoy you.
-In addition, the bot creates a new log file for each game (and a .csv scoresheet [WIP]).
+In addition, the bot creates a new log file for each game (and a .csv scoresheet \[WIP\]).
 If you want to disable log file generation, set generateLogs to False in the Setup section of QBBot.py (~Line 36).
 
 ## To-Do
+
+* Switch to Pandas for .csv scoresheets. In progress in pandasRewrite branch.
 
 * Undo command. Implemented in version 1.5.14; deprecated in version 1.6.3. Needs fixes.
 
