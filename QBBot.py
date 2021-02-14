@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.11
+# Version: 1.8.12
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -568,6 +568,7 @@ async def on_message(text):
                 break
         
         if text.content.startswith('!setup'):
+            print("Running setup...")
             botSpoke = True
             """Run this command once, after you add the bot the your server. It will handle all role and emoji creation, and set the bot's avatar.
             Please avoid running this command more than once, as doing so will create duplicate emojis. If for whatever reason you have to do so, that's fine, just be prepared to delete those emojis.'
@@ -575,7 +576,7 @@ async def on_message(text):
             report = "This command is only usable by server admins!"
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 await text.channel.send("Starting setup...")
-                report = "Successfully set up the bot! Team roles now exist, as do the following emojis: buzz, power, ten, neg."
+                report = "Successfully set up the bot!"
                 # This block handles role creation. The bot requires these roles to function, so it will make them when you run !setup.
                 willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar. If for some reason you don't want teams displayed separately, set this to False.
                 if not get(text.guild.roles, name = 'Reader'): # To avoid making duplicate roles, the Bot checks to see if these roles exist before making them.
@@ -602,28 +603,31 @@ async def on_message(text):
                 print("Roles live!")
                 
                 # This block creates the emojis the bot accepts for points and buzzes. Credit for these wonderful emojis goes to Theresa Nyowheoma, President of Quiz Bowl at NYU, 2020-2021.
-                with open("templates/emoji/buzz.png", "rb") as buzzIMG:
-                    img = buzzIMG.read()
-                    await text.guild.create_custom_emoji(name = 'buzz', image = img)
-                with open("templates/emoji/neg.png", "rb") as negIMG:
-                    img = negIMG.read()
-                    await text.guild.create_custom_emoji(name = 'neg', image = img)
-                with open("templates/emoji/ten.png", "rb") as tenIMG:
-                    img = tenIMG.read()
-                    await text.guild.create_custom_emoji(name = 'ten', image = img)
-                with open("templates/emoji/power.png", "rb") as powerIMG:
-                    img = powerIMG.read()
-                    await text.guild.create_custom_emoji(name = 'power', image = img)
-                print("Emojis live!")
-                
-                with open("templates/pfp.png", "rb") as pfp:
-                    pic = pfp.read()
-                    try:
-                        await client.user.edit(avatar=pic) # Running !setup too many times will cause the Discord API to deny API calls that try to change the profile picture.
-                        print("Avatar live!")
-                    except discord.HTTPException: # In case of the above issue:
-                        print("Avatar failed to update!")
-                        report += " Failed to update the Bot's profile picture."
+                try:
+                    with open("templates/emoji/buzz.png", "rb") as buzzIMG:
+                        img = buzzIMG.read()
+                        buzz = await text.guild.create_custom_emoji(name = 'buzz', image = img)
+                    with open("templates/emoji/neg.png", "rb") as negIMG:
+                        img = negIMG.read()
+                        neg = await text.guild.create_custom_emoji(name = 'neg', image = img)
+                    with open("templates/emoji/ten.png", "rb") as tenIMG:
+                        img = tenIMG.read()
+                        ten = await text.guild.create_custom_emoji(name = 'ten', image = img)
+                    with open("templates/emoji/power.png", "rb") as powerIMG:
+                        img = powerIMG.read()
+                        power = await text.guild.create_custom_emoji(name = 'power', image = img)
+                    print("Emojis live!")
+                    report += " Team roles now exist, as do the following emoji: " + str(buzz) + ", " + str(neg) + ", " + str(ten) + ", " + str(power) + "."
+                    with open("templates/pfp.png", "rb") as pfp:
+                        pic = pfp.read()
+                        try:
+                            await client.user.edit(avatar=pic) # Running !setup too many times will cause the Discord API to deny API calls that try to change the profile picture.
+                            print("Avatar live!")
+                        except discord.HTTPException: # In case of the above issue:
+                            print("Avatar failed to update!")
+                            report += " Failed to update the Bot's profile picture."
+                except FileNotFoundError:
+                    report = "Failed to load images for emoji or profile picture! Check your directory structure."
     
             await text.channel.send(report)
             if exist:
