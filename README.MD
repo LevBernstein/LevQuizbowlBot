@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot Rewrite Branch
 
-Release 1.8.12
+Release 1.8.13
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
