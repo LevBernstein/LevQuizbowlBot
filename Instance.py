@@ -26,7 +26,6 @@ from discord.utils import get
 # Will be used starting in Version 1.9.X.
 class Backup:
     def __init__(self, prev):
-        # TODO store TUnum here as well, to better handle negs
         self.scores = {}
         self.redBonus = 0
         self.blueBonus = 0
@@ -384,19 +383,19 @@ class Instance: # instance of an active game. Each channel a game is run in gets
             if self.lastBonusMem in self.redTeam:
                 self.redBonus += points
                 changed = 0
-            if self.lastBonusMem in self.blueTeam:
+            elif self.lastBonusMem in self.blueTeam:
                 self.blueBonus += points
                 changed = 1
-            if self.lastBonusMem in self.greenTeam:
+            elif self.lastBonusMem in self.greenTeam:
                 self.greenBonus += points
                 changed = 2
-            if self.lastBonusMem in self.orangeTeam:
+            elif self.lastBonusMem in self.orangeTeam:
                 self.orangeBonus += points
                 changed = 3
-            if self.lastBonusMem in self.yellowTeam:
+            elif self.lastBonusMem in self.yellowTeam:
                 self.yellowBonus += points
                 changed = 4
-            if self.lastBonusMem in self.purpleTeam:
+            elif self.lastBonusMem in self.purpleTeam:
                 self.purpleBonus += points
                 changed = 5
         else:

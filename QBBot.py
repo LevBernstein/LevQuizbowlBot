@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.13
+# Version: 1.8.14
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -454,12 +454,9 @@ async def on_message(text):
                         diction[x.nick] = y
                 sortedDict = OrderedDict(sorted(diction.items(), key = itemgetter(1)))
                 print(sortedDict)
-                for x, y in sortedDict.items():
-                    names.append(x)
-                limit = len(names)
-                print("Length = " + str(limit))
-                for i in range(limit):
-                    emb.add_field(name=(str(i+1) + ". " + names[limit-(i+1)]), value=str(sortedDict[names[limit-(i+1)]]), inline=True)
+                for i in range(len(sortedDict.items()):
+                    tup = sortedDict.popitem()
+                    emb.add_field(name=(str(i+1) + ". " + tup[0]), value=str(tup[1]), inline=True)
                 await text.channel.send(embed=emb)
                 report = "Embedded score."
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
@@ -470,27 +467,27 @@ async def on_message(text):
                 botSpoke = True
                 # This block handles all team assignment that was done before the game started.
                 red = get(text.guild.roles, name = 'Team red')
+                blue = get(text.guild.roles, name = 'Team blue')
+                green = get(text.guild.roles, name = 'Team green')
+                orange = get(text.guild.roles, name = 'Team orange')
+                yellow = get(text.guild.roles, name = 'Team yellow')
+                purple = get(text.guild.roles, name = 'Team purple')
                 if red in text.author.roles and not text.author in heldGame.redTeam:
                     heldGame.redTeam.append(text.author)
                     print("Added " + text.author.name +  " to red on buzz")
-                blue = get(text.guild.roles, name = 'Team blue')
-                if blue in text.author.roles and not text.author in heldGame.blueTeam:
+                elif blue in text.author.roles and not text.author in heldGame.blueTeam:
                     heldGame.blueTeam.append(text.author)
                     print("Added " + text.author.name +  " to blue on buzz")
-                green = get(text.guild.roles, name = 'Team green')
-                if green in text.author.roles and not text.author in heldGame.greenTeam:
+                elif green in text.author.roles and not text.author in heldGame.greenTeam:
                     heldGame.greenTeam.append(text.author)
                     print("Added " + text.author.name +  " to green on buzz")
-                orange = get(text.guild.roles, name = 'Team orange')
-                if orange in text.author.roles and not text.author in heldGame.orangeTeam:
+                elif orange in text.author.roles and not text.author in heldGame.orangeTeam:
                     heldGame.orangeTeam.append(text.author)
                     print("Added " + text.author.name +  " to orange on buzz")
-                yellow = get(text.guild.roles, name = 'Team yellow')
-                if yellow in text.author.roles and not text.author in heldGame.yellowTeam:
+                elif yellow in text.author.roles and not text.author in heldGame.yellowTeam:
                     heldGame.yellowTeam.append(text.author)
                     print("Added " + text.author.name +  " to yellow on buzz")
-                purple = get(text.guild.roles, name = 'Team purple')
-                if purple in text.author.roles and not text.author in heldGame.purpleTeam:
+                elif purple in text.author.roles and not text.author in heldGame.purpleTeam:
                     heldGame.purpleTeam.append(text.author)
                     print("Added " + text.author.name +  " to purple on buzz")
                 if heldGame.bonusMode == False:
