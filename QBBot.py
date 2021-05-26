@@ -453,7 +453,7 @@ async def on_message(text):
                         diction[x.nick] = y
                 sortedDict = OrderedDict(sorted(diction.items(), key = itemgetter(1)))
                 print(sortedDict)
-                for i in range(len(sortedDict.items()):
+                for i in range(len(sortedDict.items())):
                     tup = sortedDict.popitem()
                     emb.add_field(name=(str(i+1) + ". " + tup[0]), value=str(tup[1]), inline=True)
                 await text.channel.send(embed=emb)
