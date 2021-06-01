@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.15
+# Version: 1.8.16
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -81,7 +81,7 @@ def writeOut(generate, name, content, game, report, spoke):
     return
 
 
-games = [] # List holding all active games across all channels and servers. If this bot sees sufficiently large usage, I will switch to something more sorted to store the games, like a binary tree or a 2-3 tree. Games would be sorted based on channel ID.
+games = [] # List holding all active games across all channels and servers. If this bot sees sufficiently large usage, I will switch to something more sorted to store the games, like a BST or a 2-3 tree. Games would be sorted based on channel ID.
 
 
 @client.event
@@ -100,7 +100,7 @@ async def on_message(text):
     exist = False
     heldGame = None
     botSpoke = False
-    if text.author.bot == False:
+    if not text.author.bot:
         for i in range(len(games)):
             if current == games[i].getChannel():
                 exist = True
@@ -118,29 +118,22 @@ async def on_message(text):
             if text.author.guild_permissions.administrator: # Bot setup requires admin perms.
                 await text.channel.send("Starting setup...")
                 report = "Successfully set up the bot!"
+                
                 # This block handles role creation. The bot requires these roles to function, so it will make them when you run !setup.
                 willHoist = True # Hoist makes it so that a given role is displayed separately on the sidebar. If for some reason you don't want teams displayed separately, set this to False.
-                if not get(text.guild.roles, name = 'Reader'): # To avoid making duplicate roles, the Bot checks to see if these roles exist before making them.
-                    await text.guild.create_role(name = 'Reader', colour = discord.Colour(0x01ffdd), hoist = willHoist)
-                    print("Created Reader.")
-                if not get(text.guild.roles, name = 'Team red'):
-                    await text.guild.create_role(name = 'Team red', colour = discord.Colour(0xf70a0a), hoist = willHoist)
-                    print("Created Team red.")
-                if not get(text.guild.roles, name = 'Team blue'):
-                    await text.guild.create_role(name = 'Team blue', colour = discord.Colour(0x009ef7), hoist = willHoist)
-                    print("Created Team blue.")
-                if not get(text.guild.roles, name = 'Team green'):
-                    await text.guild.create_role(name = 'Team green', colour = discord.Colour(0x7bf70b), hoist = willHoist)
-                    print("Created Team green.")
-                if not get(text.guild.roles, name = 'Team orange'):
-                    await text.guild.create_role(name = 'Team orange', colour = discord.Colour(0xff6000), hoist = willHoist)
-                    print("Created Team orange.")
-                if not get(text.guild.roles, name = 'Team yellow'):
-                    await text.guild.create_role(name = 'Team yellow', colour = discord.Colour(0xfeed0e), hoist = willHoist)
-                    print("Created Team yellow.")
-                if not get(text.guild.roles, name = 'Team purple'):
-                    await text.guild.create_role(name = 'Team purple', colour = discord.Colour(0xb40eed), hoist = willHoist)
-                    print("Created Team purple.")
+                roles = {
+                    "Reader": 0x01ffdd,
+                    "Team red": 0xf70a0a,
+                    "Team blue": 0x009ef7,
+                    "Team green": 0x7bf70b,
+                    "Team orange": 0xff6000,
+                    "Team yellow": 0xfeed0e,
+                    "Team purple": 0xb40eed
+                }
+                for x, y in roles.items():
+                    if not get(text.guild.roles, name = x):
+                        await text.guild.create_role(name = x, colour = discord.Colour(y), hoist = willHoist)
+                        print("Created" + x + ".")
                 print("Roles live!")
                 
                 # This block creates the emojis the bot accepts for points and buzzes. Credit for these wonderful emojis goes to Theresa Nyowheoma, President of Quiz Bowl at NYU, 2020-2021.
@@ -220,9 +213,7 @@ async def on_message(text):
                 print("calling newreader")
                 botSpoke = True
                 target = text.content.split('@', 1)[1]
-                if target.startswith('!'):
-                    target = target[1:]
-                target = target[:-1]
+                target = target[1:-1] if target.startswith('!') else target[:-1]
                 role = get(text.guild.roles, name = 'Reader')
                 await heldGame.reader.remove_roles(role)
                 newReader = await text.guild.fetch_member(target)
@@ -244,7 +235,7 @@ async def on_message(text):
                                 #subMems = body[0]
                             #newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
                             #with open(games[i].csvScore, "a") as f:
-                                #for x,y in games[i].scores.items():
+                                #for x, y in games[i].scores.items():
                                     #newLine += str(y) + ","
                                 #f.write(newLine)
                             csvName = games[i].csvScore
@@ -396,9 +387,7 @@ async def on_message(text):
                 if text.author.id == heldGame.reader.id or text.author.guild_permissions.administrator:
                     heldGame.bonusStop()
                     heldGame.bonusEnabled = not heldGame.bonusEnabled
-                    report = "Disabled bonus mode."
-                    if heldGame.bonusEnabled:
-                        report = "Enabled bonus mode."
+                    report = "Enabled bonus mode." if heldGame.bonusEnabled else "Disabled bonus mode."
                 await text.channel.send(report)
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
                 return
@@ -446,7 +435,7 @@ async def on_message(text):
                     if areTeams:
                         desc += "\r\n\r\nIndividuals:"
                 emb = discord.Embed(title="Score", description=desc, color=0x57068C)
-                for x,y in heldGame.scores.items():
+                for x, y in heldGame.scores.items():
                     if x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
                         diction[x.name] = y
                     else:
@@ -549,7 +538,7 @@ async def on_message(text):
             emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=True)
             emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=True)
             emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=True)
-            emb.add_field(name= "!team [r/b/g/o/y/p]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
+            emb.add_field(name= "!team [red/blue/green/orange/yellow/purple]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
             emb.add_field(name= "!bonusmode", value= "Disables or enables bonuses. Bonuses are enabled by default.", inline=True)
             emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
             emb.add_field(name= "!newreader <@user>", value= "Changes a game's reader to another user.", inline=True)
@@ -559,7 +548,7 @@ async def on_message(text):
             emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
             #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
             await text.channel.send(embed=emb)
-            report = "Embedded tutorial."
+            report = "Embedded commands list."
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
             return
@@ -581,46 +570,22 @@ async def on_message(text):
             """
             print("calling team")
             botSpoke = True
-            report = "Please choose a valid team! Valid teams are red, blue, green, orange, yellow, and purple."
             rolesExist = False
-            if text.content.startswith('!team r'):
-                role = get(text.guild.roles, name = 'Team red')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team red role, " + text.author.mention + "."
-                    rolesExist = True
-            elif text.content.startswith('!team b'):
-                role = get(text.guild.roles, name = 'Team blue')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team blue role, " + text.author.mention + "."
-                    rolesExist = True
-            elif text.content.startswith('!team g'):
-                role = get(text.guild.roles, name = 'Team green')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team green role, " + text.author.mention + "."
-                    rolesExist = True
-            elif text.content.startswith('!team o'):
-                role = get(text.guild.roles, name = 'Team orange')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team orange role, " + text.author.mention + "."
-                    rolesExist = True
-            elif text.content.startswith('!team y'):
-                role = get(text.guild.roles, name = 'Team yellow')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team yellow role, " + text.author.mention + "."
-                    rolesExist = True
-            elif text.content.startswith('!team p'):
-                role = get(text.guild.roles, name = 'Team purple')
-                if role:
-                    await text.author.add_roles(role)
-                    report = "Gave you the Team purple role, " + text.author.mention + "."
-                    rolesExist = True
+            rolesFound = False
+            roles = ["red", "blue", "green", "orange", "yellow", "purple"]
+            for role in roles:
+                if text.content.startswith('!team ' + role):
+                    rolesFound = True
+                    givenRole = get(text.guild.roles, name = 'Team ' + role)
+                    if givenRole:
+                        await text.author.add_roles(givenRole)
+                        report = "Gave you the Team " + role + " role, " + text.author.mention + "."
+                        rolesExist = True
+                        break
             if not rolesExist:
                 report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."
+            if not rolesFound:
+                report = "Please choose a valid team! Valid teams are red, blue, green, orange, yellow, and purple."
             await text.channel.send(report)
             if exist:
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
