@@ -39,11 +39,13 @@ class Backup:
         self.line = ""
 
 #############################################################
-# Instance(self, channel)
+# Instance(self, channel, discordChannel)
 # This class is an instance of an active game of Quizbowl.
 # Every channel in which a game is run gets its own instance.
 # You cannot have more than one Instance per channel.
-# Parameters: channel is the id of the Discord channel in which the instance is run.
+# Parameters:
+#   channel is the id of the Discord channel in which the instance is run.
+#   discordChannel is the Discord channel object of the channel in which the instance is run.
 # Local variables:
 #   Tunum: Represents the number of completed TUs read. Advances after points are awarded for a TU or a TU goes dead (!dead).
 #   scores: Dictionary mapping players to the number of points they have.
@@ -62,7 +64,7 @@ class Backup:
 #   lastNeg: Boolean that tracks whether the last buzz was a 0/-5. Used in undo.
 #   oldScores: A Backup() of a given Instance's scores.
 class Instance: # instance of an active game. Each channel a game is run in gets its own instance. You cannot have more than one game per channel.
-    def __init__(self, channel):
+    def __init__(self, channel, discordChannel):
         self.channel = channel
         self.TUnum = 0
         self.scores = {}
@@ -79,6 +81,12 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.orangeTeam = []
         self.yellowTeam = []
         self.purpleTeam = []
+        self.redRole = get(discordChannel.guild.roles, name = 'Team red')
+        self.blueRole = get(discordChannel.guild.roles, name = 'Team blue')
+        self.greenRole = get(discordChannel.guild.roles, name = 'Team green')
+        self.orangeRole = get(discordChannel.guild.roles, name = 'Team orange')
+        self.yellowRole = get(discordChannel.guild.roles, name = 'Team yellow')
+        self.purpleRole = get(discordChannel.guild.roles, name = 'Team purple')
         self.redNeg = False
         self.blueNeg = False
         self.greenNeg = False
@@ -170,26 +178,20 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         )
         return not any(conditions)
     
-    def inTeam(self, text, mem):
+    def inTeam(self, mem):
         """When bonus mode is enabled, this method reports the team of the buzzer."""
         if mem in self.redTeam:
-            role = get(text.guild.roles, name = 'Team red')
-            return role
+            return self.redRole
         if mem in self.blueTeam:
-            role = get(text.guild.roles, name = 'Team blue')
-            return role
+            return self.blueRole
         if mem in self.greenTeam:
-            role = get(text.guild.roles, name = 'Team green')
-            return role
+            return self.greenRole
         if mem in self.orangeTeam:
-            role = get(text.guild.roles, name = 'Team orange')
-            return role
+            return self.orangeRole
         if mem in self.yellowTeam:
-            role = get(text.guild.roles, name = 'Team yellow')
-            return role
+            return self.yellowRole
         if mem in self.purpleTeam:
-            role = get(text.guild.roles, name = 'Team purple')
-            return role
+            return self.purpleRole
         return None
     
     def teamScore(self, team, teamBonus):
@@ -370,16 +372,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         if not self.bonusEnabled or not self.bonusMode:
             return
         temp = copy.copy(self.oldScores)
-        conditions = (
-            self.lastBonusMem in self.redTeam,
-            self.lastBonusMem in self.blueTeam,
-            self.lastBonusMem in self.greenTeam,
-            self.lastBonusMem in self.orangeTeam,
-            self.lastBonusMem in self.yellowTeam,
-            self.lastBonusMem in self.purpleTeam
-            )
         changed = -1
-        if any(conditions):
+        if any(self.lastBonusMem in t for t in [self.redTeam, self.blueTeam, self.greenTeam, self.orangeTeam, self.yellowTeam, self.purpleTeam]):
             if self.lastBonusMem in self.redTeam:
                 self.redBonus += points
                 changed = 0

@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.16
+# Version: 1.8.17
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -55,15 +55,7 @@ def isInt(st):
 
 def isBuzz(st):
     """Checks if an entered string is a valid buzz. If you want to allow additional means of buzzing, add them to validBuzzes."""
-    validBuzzes = (
-        st.startswith('buz'),
-        st.startswith('<:buzz:'),
-        st.startswith('bz'),
-        st.startswith('!bz'),
-        st.startswith('!buz'),
-        st.startswith('<:bee:')
-        )  
-    return any(validBuzzes)
+    return any(st.startswith(string) for string in ['buz', '<:buzz:', 'bz', '!bz', '!buz', '<:bee:'])
 
 def writeOut(generate, name, content, game, report, spoke):
     """Saves output of valid commands in the log file.
@@ -133,7 +125,7 @@ async def on_message(text):
                 for x, y in roles.items():
                     if not get(text.guild.roles, name = x):
                         await text.guild.create_role(name = x, colour = discord.Colour(y), hoist = willHoist)
-                        print("Created" + x + ".")
+                        print("Created " + x + ".")
                 print("Roles live!")
                 
                 # This block creates the emojis the bot accepts for points and buzzes. Credit for these wonderful emojis goes to Theresa Nyowheoma, President of Quiz Bowl at NYU, 2020-2021.
@@ -189,7 +181,7 @@ async def on_message(text):
                 role = get(text.guild.roles, name = 'Reader') # The bot needs you to make a role called "Reader" in order to function.
                 if role:
                     report = "Starting a new game. Reader is " + text.author.mention + "."
-                    x = Instance(current)
+                    x = Instance(current, text.channel)
                     x.reader = text.author
                     print(x.getChannel())
                     await text.author.add_roles(role)
@@ -330,7 +322,7 @@ async def on_message(text):
                             storedMem = heldGame.buzzes[0]
                             if heldGame.gain(int(text.content)):
                                 report = "Awarded TU points. "
-                                getTeam = heldGame.inTeam(text, storedMem)
+                                getTeam = heldGame.inTeam(storedMem)
                                 message = await text.channel.send(report)
                                 if getTeam != None:
                                     report += "Bonus is for " + getTeam.mention + ". "
