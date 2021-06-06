@@ -150,7 +150,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         self.oldScores.lastNeg = self.lastNeg
         self.clear()
         self.lastNeg = False
-        self.TUnum +=1
+        self.TUnum += 1
     
     def unlock(self):
         """Allows all teams to buzz in again."""
@@ -169,12 +169,12 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         while hasBuzzed() checks if you, personally, have negged.
         """
         conditions = (
-            (mem in self.redTeam and self.redNeg==True),
-            (mem in self.blueTeam and self.blueNeg==True),
-            (mem in self.greenTeam and self.greenNeg==True),
-            (mem in self.orangeTeam and self.orangeNeg==True),
-            (mem in self.yellowTeam and self.yellowNeg==True),
-            (mem in self.purpleTeam and self.purpleNeg==True)
+            (mem in self.redTeam and self.redNeg == True),
+            (mem in self.blueTeam and self.blueNeg == True),
+            (mem in self.greenTeam and self.greenNeg == True),
+            (mem in self.orangeTeam and self.orangeNeg == True),
+            (mem in self.yellowTeam and self.yellowNeg == True),
+            (mem in self.purpleTeam and self.purpleNeg == True)
         )
         return not any(conditions)
     
@@ -265,8 +265,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                             #newLane += x.name + ","
                         #newLane += mem.name + ",\r\n"
                         #print("New Body 0 = " + newLane)
-                        #body = ''.join([i for i in body]) \
-                            #.replace(lane, newLane)
+                        #body = ''.join([i for i in body]).replace(lane, newLane)
                         #print(body)
                         #with open(self.csvScore, "w") as f:
                             #f.writelines(body)
@@ -294,8 +293,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                             #newLane += x.name + ","
                         #newLane += mem.name + ",\r\n"
                         #print("New Body 0 = " + newLane)
-                        #body = ''.join([i for i in body]) \
-                            #.replace(lane, newLane)
+                        #body = ''.join([i for i in body]).replace(lane, newLane)
                         #print(body)
                         #with open(self.csvScore, "w") as f:
                             #f.writelines(body)
@@ -330,11 +328,11 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #break
             #if found:
                 #if self.oldScores.lastNeg: # if there has already been a neg on the current TU:
-                    #with open(self.csvScore, "r") as f :# split the last line; replace spot with points
-                        #reader = csv.reader(f, delimiter=',')
+                    #with open(self.csvScore, "r") as f : # split the last line; replace spot with points
+                        #reader = csv.reader(f, delimiter = ',')
                         #count = 0
                         #for row in reader:
-                            #count +=1
+                            #count += 1
                     #print(count)
                     #try:
                         #oldLane = body[count]
@@ -345,8 +343,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #total = ""
                         #for item in newLane:
                             #total += item + ","
-                        #body = ''.join([i for i in body]) \
-                            #.replace(oldLane, total)
+                        #body = ''.join([i for i in body]).replace(oldLane, total)
                         #with open(self.csvScore, "w") as f:
                             #f.writelines(body)
                     #except IndexError as err: # TODO fix indexerror that pops up from time to time
@@ -364,7 +361,7 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #writer = csv.writer(f)
                         #writer.writerow(newLine)
         if awarded:
-            self.TUnum +=1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
+            self.TUnum += 1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
         return awarded
 
     def bonusGain(self, points):

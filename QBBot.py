@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.17
+# Version: 1.8.18
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -79,7 +79,7 @@ games = [] # List holding all active games across all channels and servers. If t
 @client.event
 async def on_ready():
     """Ready message for when the bot is online."""
-    await client.change_presence(activity=discord.Game(name='Quiz Bowl!'))
+    await client.change_presence(activity=discord.Game(name = 'Quiz Bowl!'))
     print("Activity live!")
     print("Quizbowl Bot online!")
 
@@ -147,7 +147,7 @@ async def on_message(text):
                     with open("templates/pfp.png", "rb") as pfp:
                         pic = pfp.read()
                         try:
-                            await client.user.edit(avatar=pic) # Running !setup too many times will cause the Discord API to deny API calls that try to change the profile picture.
+                            await client.user.edit(avatar = pic) # Running !setup too many times will cause the Discord API to deny API calls that try to change the profile picture.
                             print("Avatar live!")
                         except discord.HTTPException: # In case of the above issue:
                             print("Avatar failed to update!")
@@ -237,7 +237,7 @@ async def on_message(text):
                             role = get(text.guild.roles, name = 'Reader')
                             await heldGame.reader.remove_roles(role) # The Reader is stored as a Member object in heldGame, so any admin can end the game and the Reader role will be removed.
                             await text.channel.send(report)
-                            await text.channel.send(file=discord.File(csvName, filename="scoresheet.csv"))
+                            await text.channel.send(file = discord.File(csvName, filename = "scoresheet.csv"))
                         else:
                             report = "You are not the reader or a server admin!"
                             await text.channel.send(report)
@@ -436,7 +436,7 @@ async def on_message(text):
                 print(sortedDict)
                 for i in range(len(sortedDict.items())):
                     tup = sortedDict.popitem()
-                    emb.add_field(name=(str(i+1) + ". " + tup[0]), value=str(tup[1]), inline=True)
+                    emb.add_field(name = (str(i+1) + ". " + tup[0]), value = str(tup[1]), inline = True)
                 await text.channel.send(embed=emb)
                 report = "Embedded score."
                 writeOut(generateLogs, text.author.name, text.content, heldGame, report, botSpoke)
@@ -519,26 +519,26 @@ async def on_message(text):
         if text.content.startswith('!help') or text.content.startswith('!commands') or text.content.startswith('!tutorial'):
             print("calling tutorial")
             emb = discord.Embed(title="Lev's Quizbowl Bot Commands", description="", color=0x57068C)
-            emb.add_field(name= "!setup", value= "Run this once, after the bot first joins the server.", inline=True)
-            emb.add_field(name= "!start", value= "Starts a new game.", inline=True)
-            emb.add_field(name= "buzz", value= "Buzzes in.", inline=True)
-            emb.add_field(name= "!clear", value= "Clears buzzes without advancing the TU count.", inline=True)
-            emb.add_field(name= "!dead", value= "Clears buzzes after a dead TU and advances the TU count.", inline=True)
-            emb.add_field(name= "!score", value= "Displays the score, sorted from highest to lowest.", inline=True)
-            emb.add_field(name= "Any whole number", value= "After a buzz or a bonus, the reader can enter a +/- whole number to assign points.", inline=True)
-            emb.add_field(name= "!call", value= "Mentions everyone in the server and informs them that it is time for practice. Usable only by admins.", inline=True)
-            emb.add_field(name= "!github", value= "Gives you a link to this bot's github page.", inline=True)
-            emb.add_field(name= "!report", value= "Gives you a link to this bot's issue-reporting page.", inline=True)
-            emb.add_field(name= "!tu", value= "Reports the current tossup number.", inline=True)
-            emb.add_field(name= "!team [red/blue/green/orange/yellow/purple]", value= "Assigns you the team role corresponding to the color you entered.", inline=True)
-            emb.add_field(name= "!bonusmode", value= "Disables or enables bonuses. Bonuses are enabled by default.", inline=True)
-            emb.add_field(name= "!bstop", value= "Kills an active bonus without giving points.", inline=True)
-            emb.add_field(name= "!newreader <@user>", value= "Changes a game's reader to another user.", inline=True)
-            emb.add_field(name= "wd", value= "Withdraws a buzz.", inline=True)
-            # emb.add_field(name= "!undo", value= "Reverts the last score change.", inline=True) # DEPRECATED until I figure out the issue with TUnum tracking.
-            emb.add_field(name= "!end", value= "Ends the active game.", inline=True)
-            emb.add_field(name= "!tutorial", value= "Shows you this list.", inline=True)
-            #emb.add_field(name= "_ _", value= "_ _", inline=True) # filler for formatting
+            emb.add_field(name = "!setup", value = "Run this once, after the bot first joins the server.", inline = True)
+            emb.add_field(name = "!start", value = "Starts a new game.", inline = True)
+            emb.add_field(name = "buzz", value = "Buzzes in.", inline = True)
+            emb.add_field(name = "!clear", value = "Clears buzzes without advancing the TU count.", inline = True)
+            emb.add_field(name = "!dead", value = "Clears buzzes after a dead TU and advances the TU count.", inline = True)
+            emb.add_field(name = "!score", value = "Displays the score, sorted from highest to lowest.", inline = True)
+            emb.add_field(name = "Any whole number", value = "After a buzz or a bonus, the reader can enter a +/- whole number to assign points.", inline = True)
+            emb.add_field(name = "!call", value = "Mentions everyone in the server and informs them that it is time for practice. Usable only by admins.", inline = True)
+            emb.add_field(name = "!github", value = "Gives you a link to this bot's github page.", inline = True)
+            emb.add_field(name = "!report", value = "Gives you a link to this bot's issue-reporting page.", inline = True)
+            emb.add_field(name = "!tu", value = "Reports the current tossup number.", inline = True)
+            emb.add_field(name = "!team [red/blue/green/orange/yellow/purple]", value = "Assigns you the team role corresponding to the color you entered.", inline = True)
+            emb.add_field(name = "!bonusmode", value = "Disables or enables bonuses. Bonuses are enabled by default.", inline = True)
+            emb.add_field(name = "!bstop", value = "Kills an active bonus without giving points.", inline = True)
+            emb.add_field(name = "!newreader <@user>", value = "Changes a game's reader to another user.", inline = True)
+            emb.add_field(name = "wd", value = "Withdraws a buzz.", inline = True)
+            # emb.add_field(name = "!undo", value = "Reverts the last score change.", inline = True) # DEPRECATED until I figure out the issue with TUnum tracking.
+            emb.add_field(name = "!end", value = "Ends the active game.", inline = True)
+            emb.add_field(name = "!tutorial", value = "Shows you this list.", inline = True)
+            #emb.add_field(name = "_ _", value = "_ _", inline = True) # filler for formatting
             await text.channel.send(embed=emb)
             report = "Embedded commands list."
             if exist:
