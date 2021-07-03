@@ -1,6 +1,6 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.18
+# Version: 1.8.19
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
@@ -34,8 +34,8 @@ from Instance import *
 
 # Setup
 try:
-    with open("token.txt", "r") as f: # in token.txt, paste in your own Discord API token
-        token = f.readline()
+    with open("token.txt", "r") as tokenFile: # in token.txt, paste in your own Discord API token
+        token = tokenFile.readline()
 except:
     print("Error! Could not read token.txt!")
     sysExit(-1)
@@ -65,11 +65,11 @@ def writeOut(generate, name, content, game, report, spoke):
     """
     if generate:
         newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{(name + ":"): >33}' + " " +  content + "\r\n")
-        with open(game.logFile, "a") as f:
-            f.write(newline)
+        with open(game.logFile, "a") as log:
+            log.write(newline)
             if spoke:
                 newline = (f'{str(datetime.now())[:-5]: <23}' + " " + f'{"BOT: ": >34}' + report + "\r\n")
-                f.write(newline)
+                log.write(newline)
     return
 
 
@@ -186,10 +186,10 @@ async def on_message(text):
                     print(x.getChannel())
                     await text.author.add_roles(role)
                     heldGame = x
-                    with open(x.logFile, "a") as f:
-                        f.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
-                    with open(x.csvScore, "a") as f:
-                        #f.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
+                    with open(x.logFile, "a") as log:
+                        log.write("Start of game in channel " + str(current) + " at " + datetime.now().strftime("%H:%M:%S") + ".\r\n\r\n")
+                    with open(x.csvScore, "a") as score:
+                        #score.write("TU#,Red Bonus,Blue Bonus,Green Bonus,Orange Bonus,Yellow Bonus,Purple Bonus,")
                         # Currently creates the scoresheet and does nothing else.
                         pass
                     games.append(x)
@@ -222,14 +222,14 @@ async def on_message(text):
                 for i in range(len(games)):
                     if current == games[i].getChannel():
                         if text.author.id == games[i].reader.id or text.author.guild_permissions.administrator:
-                            #with open(games[i].csvScore) as f:
-                                #body = f.readlines()
+                            #with open(games[i].csvScore) as score:
+                                #body = score.readlines()
                                 #subMems = body[0]
                             #newLine = "Total:," + str(games[i].redBonus) + "," + str(games[i].blueBonus) + "," + str(games[i].greenBonus) + "," + str(games[i].orangeBonus) + "," + str(games[i].yellowBonus) + "," + str(games[i].purpleBonus) + ","
-                            #with open(games[i].csvScore, "a") as f:
+                            #with open(games[i].csvScore, "a") as score:
                                 #for x, y in games[i].scores.items():
                                     #newLine += str(y) + ","
-                                #f.write(newLine)
+                                #score.write(newLine)
                             csvName = games[i].csvScore
                             games.pop(i)
                             report = "Ended the game active in this channel. Here is the scoresheet (I am rewriting all the code involving the scoresheet; it will be extremely inaccurate for some time. Scoresheets are currently empty)."
@@ -428,10 +428,7 @@ async def on_message(text):
                         desc += "\r\n\r\nIndividuals:"
                 emb = discord.Embed(title="Score", description=desc, color=0x57068C)
                 for x, y in heldGame.scores.items():
-                    if x.nick == None: # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
-                        diction[x.name] = y
-                    else:
-                        diction[x.nick] = y
+                    diction[x.name if x.nick == None else x.nick] = y # Tries to display the Member's Discord nickname if possible, but if none exists, displays their username.
                 sortedDict = OrderedDict(sorted(diction.items(), key = itemgetter(1)))
                 print(sortedDict)
                 for i in range(len(sortedDict.items())):
@@ -562,9 +559,9 @@ async def on_message(text):
             """
             print("calling team")
             botSpoke = True
-            rolesExist = False
             rolesFound = False
             roles = ["red", "blue", "green", "orange", "yellow", "purple"]
+            report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."
             for role in roles:
                 if text.content.startswith('!team ' + role):
                     rolesFound = True
@@ -572,10 +569,7 @@ async def on_message(text):
                     if givenRole:
                         await text.author.add_roles(givenRole)
                         report = "Gave you the Team " + role + " role, " + text.author.mention + "."
-                        rolesExist = True
-                        break
-            if not rolesExist:
-                report = "Uh-oh! The Discord role you are trying to add does not exist! If whoever is going to read does !start, I will create the roles for you."
+                    break
             if not rolesFound:
                 report = "Please choose a valid team! Valid teams are red, blue, green, orange, yellow, and purple."
             await text.channel.send(report)

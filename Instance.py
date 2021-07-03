@@ -254,8 +254,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.clear()
                     awarded = True
                 else:
-                    #with open(self.csvScore, "r") as f:
-                        #body = f.readlines()
+                    #with open(self.csvScore, "r") as score:
+                        #body = score.readlines()
                     #print("Body 0 = " + body[0])
                     #lane = body[0]
                     #test = lane.split(",")
@@ -267,8 +267,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #print("New Body 0 = " + newLane)
                         #body = ''.join([i for i in body]).replace(lane, newLane)
                         #print(body)
-                        #with open(self.csvScore, "w") as f:
-                            #f.writelines(body)
+                        #with open(self.csvScore, "w") as score:
+                            #score.writelines(body)
                     self.scores[mem] = points
                     self.active = False
                     self.clear()
@@ -282,8 +282,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                     self.scores[mem] = self.scores[mem] + points
                 else:
                     self.scores[mem] = points
-                    #with open(self.csvScore, "r") as f:
-                        #body = f.readlines()
+                    #with open(self.csvScore, "r") as score:
+                        #body = score.readlines()
                     #print("Body 0 = " + body[0])
                     #lane = body[0]
                     #test = lane.split(",")
@@ -295,8 +295,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #print("New Body 0 = " + newLane)
                         #body = ''.join([i for i in body]).replace(lane, newLane)
                         #print(body)
-                        #with open(self.csvScore, "w") as f:
-                            #f.writelines(body)
+                        #with open(self.csvScore, "w") as score:
+                            #score.writelines(body)
                 if len(self.buzzes) == 0:
                     self.active = False
                 if mem in self.redTeam:
@@ -317,8 +317,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 if mem in self.purpleTeam:
                     self.purpleNeg = True
                     print("purple locked out")
-            #with open(self.csvScore) as f:
-                #body = f.readlines()
+            #with open(self.csvScore) as score:
+                #body = score.readlines()
                 #subMems = body[0].split(',')
                 #found = False
                 #for i in range(len(subMems)):
@@ -328,8 +328,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #break
             #if found:
                 #if self.oldScores.lastNeg: # if there has already been a neg on the current TU:
-                    #with open(self.csvScore, "r") as f : # split the last line; replace spot with points
-                        #reader = csv.reader(f, delimiter = ',')
+                    #with open(self.csvScore, "r") as score : # split the last line; replace spot with points
+                        #reader = csv.reader(score, delimiter = ',')
                         #count = 0
                         #for row in reader:
                             #count += 1
@@ -344,8 +344,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #for item in newLane:
                             #total += item + ","
                         #body = ''.join([i for i in body]).replace(oldLane, total)
-                        #with open(self.csvScore, "w") as f:
-                            #f.writelines(body)
+                        #with open(self.csvScore, "w") as score:
+                            #score.writelines(body)
                     #except IndexError as err: # TODO fix indexerror that pops up from time to time
                         #print("IndexError!")
                         #print(err)
@@ -357,8 +357,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                         #newLine.append('')
                     #newLine.append(str(points))
                     #print(newLine)
-                    #with open(self.csvScore, "a+", newline='') as f:
-                        #writer = csv.writer(f)
+                    #with open(self.csvScore, "a+", newline='') as score:
+                        #writer = csv.writer(score)
                         #writer.writerow(newLine)
         if awarded:
             self.TUnum += 1 # If a positive # of points has been assigned, that means someone got the TU correct. Advance the TU count.
@@ -391,11 +391,11 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 changed = 5
         else:
             self.scores[self.lastBonusMem] += points
-        #with open(self.csvScore, "r+") as f:
-            #body = f.readlines()
+        #with open(self.csvScore, "r+") as score:
+            #body = score.readlines()
             #lastLine = body.pop().split(',')
-        #with open(self.csvScore, "w") as f:
-            #f.writelines(body)
+        #with open(self.csvScore, "w") as score:
+            #score.writelines(body)
         #print(lastLine)
         #lastLine[1] = "0"
         #lastLine[2] = "0"
@@ -425,8 +425,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
         #else:
             #print("selfAdded")
             #found = False
-            #with open(self.csvScore) as f:
-                #body = f.readlines()
+            #with open(self.csvScore) as score:
+                #body = score.readlines()
                 #subMems = body[0].split(',')
                 #found = False
                 #for i in range(len(subMems)):
@@ -440,8 +440,8 @@ class Instance: # instance of an active game. Each channel a game is run in gets
                 #print(points)
                 #lastLine[spot] = str(self.lastTossupPoints + points)
                 #print(lastLine[spot])
-        #with open(self.csvScore, "a+", newline='') as f:
-            #writer = csv.writer(f)
+        #with open(self.csvScore, "a+", newline='') as score:
+            #writer = csv.writer(score)
             #print(lastLine)
             #writer.writerow(lastLine)
         self.bonusMode = False
