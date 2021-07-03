@@ -1,11 +1,11 @@
 # Lev's Quizbowl Bot
 # Author: Lev Bernstein
-# Version: 1.8.19
+# Version: 1.9.0
 # This bot is designed to be a user-friendly Quizbowl Discord bot with a minimum of setup.
 # All commands are documented; if you need any help understanding them, try the command !tutorial.
 # This bot is free software, licensed under the GNU GPL version 3. If you want to modify the bot in any way,
 # you are absolutely free to do so. If you make a change you think others would enjoy, I'd encourage you to
-# make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite).
+# make a pull request on the bot's GitHub page (https://github.com/LevBernstein/LevQuizbowlBot/).
 
 # Default modules:
 import asyncio

@@ -1,6 +1,10 @@
 # Lev's Quizbowl Bot Rewrite Branch
 
-Release 1.8.18
+Release 1.9.0
+
+Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot/releases/tag/v1.7.2)
+
+Unstable Build: Release 1.9.0
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
@@ -28,7 +32,7 @@ yourself is a good idea.
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
 
-* Pandas (exclusive to rewrite branch). To install, run "pip install pandas"
+* Pandas. To install, run "pip install pandas"
 
 * Future versions will require the Google Client Library; this version does not. To install it, run "pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
 
@@ -53,7 +57,7 @@ In the *nix command line, cd to the directory containing QBBot.py. Then run "pyt
 
 The bot outputs a lot to the command line, just because I like having a lot of information available.
 You can comment out the print statements if they annoy you.
-In addition, the bot creates a new log file for each game (and a .csv scoresheet [WIP]).
+In addition, the bot creates a new log file for each game (and a .csv scoresheet \[WIP\]).
 If you want to disable log file generation, set generateLogs to False in the Setup section of QBBot.py (~Line 36).
 
 ## To-Do
