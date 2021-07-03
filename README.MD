@@ -1,4 +1,4 @@
-# Lev's Quizbowl Bot Rewrite Branch
+# Lev's Quizbowl Bot
 
 Release 1.9.0
 
