@@ -1,10 +1,10 @@
 # Lev's Quizbowl Bot
 
+Release 1.9.0
+
 Stable Build: [Release 1.7.2](https://github.com/LevBernstein/LevQuizbowlBot/releases/tag/v1.7.2)
 
-Unstable Build: Release 1.8.2
-
-Pandas Rewrite Branch: [In development here](https://github.com/LevBernstein/LevQuizbowlBot/tree/pandasRewrite)
+Unstable Build: Release 1.9.0
 
 A Discord bot designed for playing Quizbowl, written in Python.
 
@@ -31,6 +31,8 @@ yourself is a good idea.
 * Python 3. To install, visit [the Python downloads page](https://python.org/downloads/) and follow the instructions for your OS.
 
 * Discord.py. To install, run "python3 -m pip install -U discord.py"
+
+* Pandas. To install, run "pip install pandas"
 
 * Future versions will require the Google Client Library; this version does not. To install it, run "pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib"
 
